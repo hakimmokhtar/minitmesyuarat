@@ -183,7 +183,7 @@ elems.append(Spacer(1,8))
     elems.append(Spacer(1,8))
 
     # Perbincangan
-    elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
+elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
     for idx, ag in enumerate(agenda, start=1):
         elems.append(Paragraph(f"<b>{idx}. {ag['title']}</b>", normal))
         lines = [ln.strip() for ln in (ag['notes'] or "").splitlines() if ln.strip()]
@@ -194,7 +194,7 @@ elems.append(Spacer(1,8))
             elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
 
-    elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
+elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
     if hal_berbangkit.strip():
         for ln in hal_berbangkit.splitlines():
             elems.append(Paragraph(ln, normal))
@@ -225,6 +225,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
