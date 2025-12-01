@@ -78,6 +78,16 @@ agenda_text = st.text_area(
 )
 agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
+# ======== Agenda Input ========
+st.markdown("### Agenda")
+num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value=5, step=1)
+agenda = []
+for i in range(int(num_agenda)):
+    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
+    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
+    agenda.append({"title": title, "notes": notes})
+
+
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
 penutup = st.text_area(
@@ -209,3 +219,4 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
