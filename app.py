@@ -74,13 +74,6 @@ for i, ajk in enumerate(AJK_LIST):
 st.markdown("### Agenda")
 num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value=5, step=1)
 
-st.markdown("### Senarai Agenda")
-agenda_text = st.text_area(
-    "Senarai Agenda (satu baris = satu agenda)",
-    value="",
-    height=150
-)
-agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
 agenda = []
 for i in range(int(num_agenda)):
@@ -230,6 +223,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
