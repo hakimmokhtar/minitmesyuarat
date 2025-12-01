@@ -207,15 +207,27 @@ def build_pdf():
     buffer.seek(0)
     return buffer
 
+    def build_pdf(logo_file):
+    ...
+    if logo_file:  # sekarang Python tahu logo_file wujud
+        img_bio = get_reportlab_image(logo_file, max_width_mm=30)
+        if img_bio:
+            img = Image(img_bio)
+            img.drawHeight = 22*mm
+            elems.append(img)
+    ...
+
 # ======== Generate Button ========
 if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
     else:
-        pdf_buf = build_pdf()
+        pdf_buf = build_pdf(logo_file)  # <--- hantar logo_file
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
+
 
 
 
