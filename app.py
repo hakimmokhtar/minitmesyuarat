@@ -168,7 +168,7 @@ def build_pdf():
 
     # Agenda
     elems.append(Paragraph("<b>AGENDA</b>", h2))
-    for i, ag in enumerate(agenda, start=1):
+    for i, ag in enumerate(agenda):
         elems.append(Paragraph(f"{i}) {ag['title']}", normal))
     elems.append(Spacer(1,8))
 
@@ -219,4 +219,5 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
