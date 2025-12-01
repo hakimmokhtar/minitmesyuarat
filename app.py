@@ -50,17 +50,8 @@ att_rows = []
 
 for i, ajk in enumerate(AJK_LIST):
     jawatan, nama = ajk.split(" - ")
-
-    c1, c2, c3, c4, c5 = st.columns([1, 2, 3, 1, 2])
-
-    hadir = c4.selectbox(
-        f"Hadir {nama}",
-        options=["/", "X"],
-        key=f"hadir_{i}"
-    )
-
-    catatan = c5.text_input(f"Catatan {nama}", key=f"catatan_{i}")
-
+    hadir = st.selectbox(f"{jawatan} - {nama}", options=["/", "X"], key=f"hadir_{i}")
+    catatan = st.text_input(f"Catatan {nama}", key=f"catatan_{i}")
     att_rows.append({
         "no": str(i+1),
         "jawatan": jawatan,
@@ -114,16 +105,21 @@ def build_pdf():
     h2 = ParagraphStyle(name='SmallBold', fontSize=10, leading=12, spaceAfter=4)
     elems = []
 
-    # Header
+    # Header: Logo + Text
+    header_data = []
     if logo_file:
         img_bio = get_reportlab_image(logo_file, max_width_mm=30)
-        if img_bio:
-            img = Image(img_bio)
-            img.drawHeight = 22*mm
-            elems.append(img)
+        img = Image(img_bio)
+        img.drawHeight = 22*mm
+        img.hAlign = 'LEFT'
+        header_data.append([img, Paragraph("<b>Jabatan Setiausaha<br/>Dewan Pemuda PAS Kawasan Rembau</b>", h1)])
+    else:
+        header_data.append([Paragraph("<b>Jabatan Setiausaha<br/>Dewan Pemuda PAS Kawasan Rembau</b>", h1)])
 
-    elems.append(Paragraph("Jabatan Setiausaha", h1))
-    elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
+    header_tbl = Table(header_data, colWidths=[35*mm, 120*mm])
+    elems.append(header_tbl)
+    elems.append(Spacer(1,6))
+
     elems.append(Paragraph("<b>MINIT MESYUARAT AHLI JAWATANKUASA</b>", h1))
     bil_text = bil.strip() or "___"
     elems.append(Paragraph(f"<b>BIL. {bil_text} / 2025–2027</b>", h1))
@@ -148,7 +144,11 @@ def build_pdf():
     tbl.setStyle(TableStyle([
         ('GRID',(0,0),(-1,-1),0.4,colors.grey),
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
-        ('VALIGN',(0,0),(-1,-1),'MIDDLE')
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('ALIGN',(0,0),(0,-1),'CENTER'),
+        ('ALIGN',(3,1),(3,-1),'CENTER'),
+        ('ALIGN',(4,1),(4,-1),'CENTER'),
+        ('WORDWRAP', (1,1), (2,-1), 'CJK')
     ]))
     elems.append(tbl)
     elems.append(Spacer(1,4))
