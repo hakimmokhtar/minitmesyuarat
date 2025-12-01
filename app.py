@@ -144,7 +144,28 @@ def build_pdf():
     for r in att_rows:
         table_data.append([r["no"], r["jawatan"], r["nama"], r["hadir"], r["cat"]])
 
-    tbl = Table(table_data, colWidths=[12*mm, 40*mm, 70*mm, 18*mm, 30*mm])
+    # Jadual Kehadiran — Column width FIXED (tidak bertindih)
+tbl = Table(
+    table_data,
+    colWidths=[
+        12*mm,   # No
+        35*mm,   # Jawatan (fixed)
+        75*mm,   # Nama (lebih besar)
+        12*mm,   # Hadir
+        30*mm    # Catatan
+    ]
+)
+
+tbl.setStyle(TableStyle([
+    ('GRID', (0,0), (-1,-1), 0.4, colors.grey),
+    ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+    ('FONTSIZE', (0,0), (-1,-1), 9),
+    ('LEFTPADDING', (0,0), (-1,-1), 3),
+    ('RIGHTPADDING', (0,0), (-1,-1), 3),
+]))
+
     tbl.setStyle(TableStyle([
         ('GRID',(0,0),(-1,-1),0.4,colors.grey),
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
@@ -204,3 +225,4 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
