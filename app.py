@@ -80,6 +80,12 @@ agenda_text = st.text_area(
 )
 agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
+    # Agenda list
+    elems.append(Paragraph("<b>AGENDA</b>", h2))
+    for i, ag in enumerate(agenda, start=1):
+        elems.append(Paragraph(f"{i}) {ag['title']}", normal))
+    elems.append(Spacer(1,8))
+
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
 penutup = st.text_area(
