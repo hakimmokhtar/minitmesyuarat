@@ -144,46 +144,25 @@ def build_pdf():
     for r in att_rows:
         table_data.append([r["no"], r["jawatan"], r["nama"], r["hadir"], r["cat"]])
 
-    # Jadual Kehadiran — Column width FIXED (tidak bertindih)
-tbl = Table(
-    table_data,
-    colWidths=[
-        12*mm,   # No
-        35*mm,   # Jawatan (fixed)
-        75*mm,   # Nama (lebih besar)
-        12*mm,   # Hadir
-        30*mm    # Catatan
-    ]
-)
-
-tbl.setStyle(TableStyle([
-    ('GRID', (0,0), (-1,-1), 0.4, colors.grey),
-    ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
-    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-    ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
-    ('FONTSIZE', (0,0), (-1,-1), 9),
-    ('LEFTPADDING', (0,0), (-1,-1), 3),
-    ('RIGHTPADDING', (0,0), (-1,-1), 3),
-]))
-
-tbl.setStyle(TableStyle([
+    tbl = Table(table_data, colWidths=[12*mm, 40*mm, 70*mm, 18*mm, 30*mm])
+    tbl.setStyle(TableStyle([
         ('GRID',(0,0),(-1,-1),0.4,colors.grey),
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
         ('VALIGN',(0,0),(-1,-1),'MIDDLE')
     ]))
-elems.append(tbl)
-elems.append(Spacer(1,4))
-elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran or '-'}", normal))
-elems.append(Spacer(1,8))
+    elems.append(tbl)
+    elems.append(Spacer(1,4))
+    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran or '-'}", normal))
+    elems.append(Spacer(1,8))
 
     # Agenda list
-elems.append(Paragraph("<b>AGENDA</b>", h2))
+    elems.append(Paragraph("<b>AGENDA</b>", h2))
     for i, ag in enumerate(agenda, start=1):
-elems.append(Paragraph(f"{i}) {ag['title']}", normal))
-elems.append(Spacer(1,8))
+        elems.append(Paragraph(f"{i}) {ag['title']}", normal))
+    elems.append(Spacer(1,8))
 
     # Perbincangan
-elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
+    elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
     for idx, ag in enumerate(agenda, start=1):
         elems.append(Paragraph(f"<b>{idx}. {ag['title']}</b>", normal))
         lines = [ln.strip() for ln in (ag['notes'] or "").splitlines() if ln.strip()]
@@ -194,7 +173,7 @@ elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
             elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
 
-elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
+    elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
     if hal_berbangkit.strip():
         for ln in hal_berbangkit.splitlines():
             elems.append(Paragraph(ln, normal))
@@ -225,11 +204,3 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
-
-
-
-
-
-
-
-
