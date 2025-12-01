@@ -172,8 +172,8 @@ def build_pdf():
             if lines:
                 for ln in lines:
                     elems.append(Paragraph(ln, normal))
-        else:
-            elems.append(Paragraph("-", normal))
+    else:
+        elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
 
     elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
@@ -212,6 +212,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
