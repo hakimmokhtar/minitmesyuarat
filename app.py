@@ -14,7 +14,7 @@ st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
 st.write("Pilih template mesyuarat → isi borang → klik **Generate PDF** untuk muat turun minit mengikut format rasmi.")
 
 # --- Template selection ---
-template = st.selectbox("Pilih Template Mesyuarat", ["AJK (Standard DPPKR)", "Mesyuarat Lajnah", "Retreat / Program Planning"])
+template = st.selectbox("Pilih Template Mesyuarat", ["Harian", "EXCO",])
 
 # --- Common header inputs ---
 with st.expander("Maklumat Umum Mesyuarat", expanded=True):
@@ -227,3 +227,4 @@ if st.checkbox("Simpan rekod minit (lokal JSON)"):
 
 st.markdown("---")
 st.write("Versi: 1.1 — Multi-Template (AJK / Lajnah / Retreat).")
+
