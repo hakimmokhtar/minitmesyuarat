@@ -23,7 +23,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     masa = st.text_input("Masa", value="9:00 PM")
     tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
     nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
-    
+    logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
 st.markdown("### Kehadiran AJK")
@@ -69,28 +69,14 @@ for i, ajk in enumerate(AJK_LIST):
         "cat": catatan
     })
 
-jumlah_kehadiran = st.text_input("Jumlah kehadiran (contoh: 12 / 15)", value="")
-
-
 # ======== Agenda Input ========
-st.markdown("### Agenda")
-num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value=5, step=1)
-
-st.markdown("### Senarai Agenda")
+st.markdown("### Senarai Agenda (boleh tampal semua tajuk sekaligus)")
 agenda_text = st.text_area(
-    "Senarai Agenda (satu baris = satu agenda)",
+    "Satu baris = satu agenda",
     value="",
     height=150
 )
 agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
-
-agenda = []
-for i in range(int(num_agenda)):
-    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
-    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
-    agenda.append({"title": title, "notes": notes})
-
-
 
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
@@ -115,7 +101,7 @@ def get_reportlab_image(file, max_width_mm=30):
     return bio
 
 # ======== PDF Builder ========
-def build_pdf():
+def build_pdf(logo_file=None):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
                             rightMargin=18*mm, leftMargin=18*mm,
@@ -127,7 +113,7 @@ def build_pdf():
     elems = []
 
     # Header
-    if logo_file:
+    if logo_file is not None:
         img_bio = get_reportlab_image(logo_file, max_width_mm=30)
         if img_bio:
             img = Image(img_bio)
@@ -164,10 +150,13 @@ def build_pdf():
     ]))
     elems.append(tbl)
     elems.append(Spacer(1,4))
-    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran or '-'}", normal))
+
+    # Auto jumlah kehadiran
+    jumlah_kehadiran_auto = sum(1 for r in att_rows if r["hadir"] == "/")
+    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran_auto} / {len(att_rows)}", normal))
     elems.append(Spacer(1,8))
 
-    # Agenda list
+    # Agenda
     elems.append(Paragraph("<b>AGENDA</b>", h2))
     for i, ag in enumerate(agenda, start=1):
         elems.append(Paragraph(f"{i}) {ag['title']}", normal))
@@ -185,56 +174,46 @@ def build_pdf():
             elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
 
+    # Hal-hal berbangkit
     elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
     if hal_berbangkit.strip():
         for ln in hal_berbangkit.splitlines():
             elems.append(Paragraph(ln, normal))
     else:
         elems.append(Paragraph("-", normal))
-
     elems.append(Spacer(1,10))
+
+    # Penutup
     elems.append(Paragraph("<b>PENUTUP</b>", h2))
     elems.append(Paragraph(penutup or "-", normal))
     elems.append(Spacer(1,14))
 
+    # Signature style
+    signature_style = ParagraphStyle(
+        name="Signature",
+        fontName="Helvetica-Oblique",  # boleh tukar ke BrushScriptMT kalau font ada
+        fontSize=12,
+        leading=14
+    )
+
+    # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
-    elems.append(Paragraph("…………………………………….", normal))
-    elems.append(Paragraph(f"{nama_su}", normal))
+    sign_line = "__________________________"
+    elems.append(Paragraph(sign_line, normal))
+    elems.append(Paragraph(f"{nama_su}", signature_style))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
     doc.build(elems)
     buffer.seek(0)
     return buffer
 
-    def build_pdf(logo_file=None):  # <-- tambah parameter
-    
-        if logo_file is not None:  # <-- check dulu
-            img_bio = get_reportlab_image(logo_file, max_width_mm=30)
-            if img_bio:
-                img = Image(img_bio)
-                img.drawHeight = 22*mm
-                elems.append(img)
-
-    
-
 # ======== Generate Button ========
 if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
     else:
-        pdf_buf = build_pdf(logo_file)  # <--- hantar logo_file
+        pdf_buf = build_pdf(logo_file)  # hantar logo_file
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
-
-
-
-
-
-
-
-
-
-
-
