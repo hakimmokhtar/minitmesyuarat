@@ -171,7 +171,7 @@ tbl.setStyle(TableStyle([
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
         ('VALIGN',(0,0),(-1,-1),'MIDDLE')
     ]))
-    elems.append(tbl)
+elems.append(tbl)
     elems.append(Spacer(1,4))
     elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran or '-'}", normal))
     elems.append(Spacer(1,8))
@@ -225,5 +225,6 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
