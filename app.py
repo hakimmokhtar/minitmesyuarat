@@ -37,7 +37,7 @@ AJK_LIST = [
     "Bendahari - Izzuddin",
     "Penerangan - Afiq Asnawi",
     "Jabatan Pembangunan Remaja - Muzammil",
-    "Kebajikan - Ma’az",
+    "Pilihanraya & Kebajikan - Ma’az",
     "Aktar - Arif Aiman",
     "Jabatan Amal - Umair",
     "Dakwah - Ust Zaid",
