@@ -22,7 +22,6 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     tarikh = st.date_input("Tarikh", value=date.today())
     masa = st.text_input("Masa", value="9:00 PM")
     tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
-    pengerusi = st.text_input("Pengerusi", value="")
     nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
     logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
 
@@ -227,4 +226,5 @@ if st.checkbox("Simpan rekod minit (lokal JSON)"):
 
 st.markdown("---")
 st.write("Versi: 1.1 — Multi-Template (AJK / Lajnah / Retreat).")
+
 
