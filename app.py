@@ -8,9 +8,8 @@ from reportlab.lib import colors
 from io import BytesIO
 from PIL import Image as PILImage
 from datetime import date
-from reportlab.lib.styles import ParagraphStyle
 
-st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
+st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
 st.write("Pilih template mesyuarat → isi borang → klik **Generate PDF** untuk muat turun minit mengikut format rasmi.")
 
@@ -24,11 +23,10 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     masa = st.text_input("Masa", value="9:00 PM")
     tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
     nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
-    
+    logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
 
-# ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
+# ======== Kehadiran Automasuk ========
 st.markdown("### Kehadiran AJK")
-
 AJK_LIST = [
     "Ketua Pemuda - Irsyad",
     "Timbalan Ketua Pemuda - Zafreen",
@@ -48,31 +46,12 @@ AJK_LIST = [
 ]
 
 att_rows = []
-
 for i, ajk in enumerate(AJK_LIST):
     jawatan, nama = ajk.split(" - ")
-
-    c1, c2, c3, c4, c5 = st.columns([1, 2, 3, 1, 2])
-
-    hadir = c4.selectbox(
-        f"Hadir {nama}",
-        options=["/", "X"],
-        key=f"hadir_{i}"
-    )
-
+    c1, c2, c3, c4, c5 = st.columns([1,2,3,1,2])
+    hadir = c4.selectbox(f"Hadir {nama}", options=["/", "X"], key=f"hadir_{i}")
     catatan = c5.text_input(f"Catatan {nama}", key=f"catatan_{i}")
-
-    att_rows.append({
-        "no": str(i+1),
-        "jawatan": jawatan,
-        "nama": nama,
-        "hadir": hadir,
-        "cat": catatan
-    })
-
-# ======== Agenda Input ========
-st.markdown("### Agenda")
-num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value=5, step=1)
+    att_rows.append({"no": str(i+1), "jawatan": jawatan, "nama": nama, "hadir": hadir, "cat": catatan})
 
 # ======== Agenda Input ========
 st.markdown("### Senarai Agenda")
@@ -83,20 +62,9 @@ agenda_text = st.text_area(
 )
 agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
-agenda = []
-for i in range(int(num_agenda)):
-    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
-    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
-    agenda.append({"title": title, "notes": notes})
-
-
-
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
-penutup = st.text_area(
-    "Penutup",
-    value="Mesyuarat diakhiri dengan tasbih kafarah & Surah Al-Asr"
-)
+penutup = st.text_area("Penutup", value="Mesyuarat diakhiri dengan tasbih kafarah & Surah Al-Asr")
 
 # ======== Helper: Logo scaling ========
 def get_reportlab_image(file, max_width_mm=30):
@@ -114,7 +82,7 @@ def get_reportlab_image(file, max_width_mm=30):
     return bio
 
 # ======== PDF Builder ========
-def build_pdf():
+def build_pdf(logo_file):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
                             rightMargin=18*mm, leftMargin=18*mm,
@@ -140,22 +108,19 @@ def build_pdf():
     elems.append(Paragraph(f"<b>BIL. {bil_text} / 2025–2027</b>", h1))
     elems.append(Spacer(1,6))
 
-    meta = [
-        ["Tarikh:", tarikh.strftime("%d %B %Y")],
-        ["Masa:", masa],
-        ["Tempat:", tempat]
-    ]
+    meta = [["Tarikh:", tarikh.strftime("%d %B %Y")],
+            ["Masa:", masa],
+            ["Tempat:", tempat]]
     mt = Table(meta, colWidths=[40*mm, 110*mm])
     elems.append(mt)
     elems.append(Spacer(1,6))
 
-    # Kehadiran table
+    # Kehadiran
     elems.append(Paragraph("<b>KEHADIRAN</b>", h2))
     table_data = [["No","Jawatan","Nama","Hadir","Catatan"]]
     for r in att_rows:
         table_data.append([r["no"], r["jawatan"], r["nama"], r["hadir"], r["cat"]])
-
-    tbl = Table(table_data, colWidths=[12*mm, 70*mm, 40*mm, 18*mm, 30*mm])
+    tbl = Table(table_data, colWidths=[12*mm,70*mm,40*mm,18*mm,30*mm])
     tbl.setStyle(TableStyle([
         ('GRID',(0,0),(-1,-1),0.4,colors.grey),
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
@@ -201,25 +166,20 @@ def build_pdf():
     elems.append(Paragraph(penutup or "-", normal))
     elems.append(Spacer(1,14))
 
-    # Definisi style baru
-    signature_style = ParagraphStyle(
-    name="Signature",
-    fontName="BrushScriptMT",  # nama font ReportLab
-    fontSize=12,
-    leading=14
-    )
-
-    # Gunakan style itu
-    elems.append(Paragraph(f"{nama_su}", signature_style))
-    
     # Signature
+    sign_line = "__________________________"
+    signature_style = ParagraphStyle(
+        name="Signature",
+        fontName="Helvetica-Oblique",
+        fontSize=12,
+        leading=14
+    )
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
     elems.append(Paragraph(sign_line, normal))
-    elems.append(Paragraph(f"{nama_su}", "Brush Script MT"))
+    elems.append(Paragraph(f"{nama_su}", signature_style))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
-    
     doc.build(elems)
     buffer.seek(0)
     return buffer
@@ -229,16 +189,8 @@ if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
     else:
-        pdf_buf = build_pdf()
+        pdf_buf = build_pdf(logo_file)
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
-                           file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
-
-
-
-
-
-
-
-
-
+                           file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf",
+                           mime="application/pdf")
