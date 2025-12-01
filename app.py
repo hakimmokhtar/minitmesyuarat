@@ -56,6 +56,7 @@ for i, ajk in enumerate(AJK_LIST):
     hadir = c4.selectbox(
         f"Hadir {nama}",
         options=["/", "X"],
+        index=0,  # "/" automatik pilih
         key=f"hadir_{i}"
     )
 
@@ -69,16 +70,14 @@ for i, ajk in enumerate(AJK_LIST):
         "cat": catatan
     })
 
-jumlah_kehadiran = st.text_input("Jumlah kehadiran (contoh: 12 / 15)", value="")
-
-# ======== Agenda Input ========
+# ======== Agenda Input (satu kotak) ========
 st.markdown("### Agenda")
-num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value=5, step=1)
-agenda = []
-for i in range(int(num_agenda)):
-    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
-    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
-    agenda.append({"title": title, "notes": notes})
+agenda_text = st.text_area(
+    "Senarai Agenda (satu baris = satu agenda)",
+    value="",
+    height=150
+)
+agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
@@ -114,21 +113,27 @@ def build_pdf():
     h2 = ParagraphStyle(name='SmallBold', fontSize=10, leading=12, spaceAfter=4)
     elems = []
 
-    # Header
+    # Header Letterhead
+    header_data = []
     if logo_file:
         img_bio = get_reportlab_image(logo_file, max_width_mm=30)
-        if img_bio:
-            img = Image(img_bio)
-            img.drawHeight = 22*mm
-            elems.append(img)
+        img = Image(img_bio)
+        img.drawHeight = 22*mm
+        img.hAlign = 'LEFT'
+        header_data.append([img, Paragraph("<b>Jabatan Setiausaha<br/>Dewan Pemuda PAS Kawasan Rembau</b>", h1)])
+    else:
+        header_data.append([Paragraph("<b>Jabatan Setiausaha<br/>Dewan Pemuda PAS Kawasan Rembau</b>", h1)])
 
-    elems.append(Paragraph("Jabatan Setiausaha", h1))
-    elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
+    header_tbl = Table(header_data, colWidths=[35*mm, 120*mm])
+    elems.append(header_tbl)
+    elems.append(Spacer(1,6))
+
     elems.append(Paragraph("<b>MINIT MESYUARAT AHLI JAWATANKUASA</b>", h1))
     bil_text = bil.strip() or "___"
     elems.append(Paragraph(f"<b>BIL. {bil_text} / 2025–2027</b>", h1))
     elems.append(Spacer(1,6))
 
+    # Meta
     meta = [
         ["Tarikh:", tarikh.strftime("%d %B %Y")],
         ["Masa:", masa],
@@ -144,18 +149,24 @@ def build_pdf():
     for r in att_rows:
         table_data.append([r["no"], r["jawatan"], r["nama"], r["hadir"], r["cat"]])
 
-    tbl = Table(table_data, colWidths=[12*mm, 70*mm, 40*mm, 18*mm, 30*mm])
+    tbl = Table(table_data, colWidths=[12*mm, 40*mm, 70*mm, 18*mm, 30*mm])
     tbl.setStyle(TableStyle([
         ('GRID',(0,0),(-1,-1),0.4,colors.grey),
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
-        ('VALIGN',(0,0),(-1,-1),'MIDDLE')
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('ALIGN',(0,0),(0,-1),'CENTER'),
+        ('ALIGN',(3,1),(3,-1),'CENTER'),
+        ('ALIGN',(4,1),(4,-1),'CENTER'),
     ]))
     elems.append(tbl)
+
+    # Auto jumlah kehadiran
+    jumlah_kehadiran_auto = sum(1 for r in att_rows if r["hadir"] == "/")
     elems.append(Spacer(1,4))
-    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran or '-'}", normal))
+    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran_auto} / {len(att_rows)}", normal))
     elems.append(Spacer(1,8))
 
-    # Agenda list
+    # Agenda
     elems.append(Paragraph("<b>AGENDA</b>", h2))
     for i, ag in enumerate(agenda, start=1):
         elems.append(Paragraph(f"{i}) {ag['title']}", normal))
@@ -173,6 +184,7 @@ def build_pdf():
             elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
 
+    # Hal-hal berbangkit
     elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
     if hal_berbangkit.strip():
         for ln in hal_berbangkit.splitlines():
@@ -180,14 +192,16 @@ def build_pdf():
     else:
         elems.append(Paragraph("-", normal))
 
+    # Penutup
     elems.append(Spacer(1,10))
     elems.append(Paragraph("<b>PENUTUP</b>", h2))
     elems.append(Paragraph(penutup or "-", normal))
     elems.append(Spacer(1,14))
 
+    # Auto sign SU
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
-    elems.append(Paragraph("…………………………………….", normal))
+    elems.append(Paragraph("__________________________", normal))
     elems.append(Paragraph(f"{nama_su}", normal))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
@@ -204,5 +218,3 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
-
-
