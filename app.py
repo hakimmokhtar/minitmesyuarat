@@ -73,12 +73,12 @@ jumlah_kehadiran = st.text_input("Jumlah kehadiran (contoh: 12 / 15)", value="")
 
 # Agenda list
 st.markdown("### Agenda")
-    agenda_text = st.text_area(
+agenda_text = st.text_area(
     "Senarai Agenda (satu baris = satu agenda)",
     value="",
     height=150
-    )
-    agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
+)
+agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
@@ -205,6 +205,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
