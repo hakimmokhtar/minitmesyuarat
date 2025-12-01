@@ -69,14 +69,16 @@ for i, ajk in enumerate(AJK_LIST):
         "cat": catatan
     })
 
+jumlah_kehadiran = st.text_input("Jumlah kehadiran (contoh: 12 / 15)", value="")
+
 # ======== Agenda Input ========
-st.markdown("### Senarai Agenda")
-agenda_text = st.text_area(
-    "Senarai Agenda (satu baris = satu agenda)",
-    value="",
-    height=150
-)
-agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
+st.markdown("### Agenda")
+num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value=5, step=1)
+agenda = []
+for i in range(int(num_agenda)):
+    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
+    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
+    agenda.append({"title": title, "notes": notes})
 
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
@@ -150,13 +152,10 @@ def build_pdf():
     ]))
     elems.append(tbl)
     elems.append(Spacer(1,4))
-
-    # Auto jumlah kehadiran
-    jumlah_kehadiran_auto = sum(1 for r in att_rows if r["hadir"] == "/")
-    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran_auto} / {len(att_rows)}", normal))
+    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran or '-'}", normal))
     elems.append(Spacer(1,8))
 
-    # Agenda
+    # Agenda list
     elems.append(Paragraph("<b>AGENDA</b>", h2))
     for i, ag in enumerate(agenda, start=1):
         elems.append(Paragraph(f"{i}) {ag['title']}", normal))
@@ -174,25 +173,21 @@ def build_pdf():
             elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
 
-    # Hal-hal berbangkit
     elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
     if hal_berbangkit.strip():
         for ln in hal_berbangkit.splitlines():
             elems.append(Paragraph(ln, normal))
     else:
         elems.append(Paragraph("-", normal))
-    elems.append(Spacer(1,10))
 
-    # Penutup
+    elems.append(Spacer(1,10))
     elems.append(Paragraph("<b>PENUTUP</b>", h2))
     elems.append(Paragraph(penutup or "-", normal))
     elems.append(Spacer(1,14))
 
-    # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
-    sign_line = "__________________________"
-    elems.append(Paragraph(sign_line, normal))
+    elems.append(Paragraph("…………………………………….", normal))
     elems.append(Paragraph(f"{nama_su}", normal))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
@@ -209,3 +204,4 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
