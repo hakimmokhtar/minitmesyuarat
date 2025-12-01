@@ -110,7 +110,7 @@ def build_pdf():
         ["Tarikh:", tarikh.strftime("%d %B %Y")],
         ["Masa:", masa],
         ["Tempat:", tempat],
-        ["Pengerusi:", pengerusi]
+        
     ]
     mt = Table(meta, colWidths=[40*mm, 110*mm])
     mt.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP')]))
@@ -226,5 +226,6 @@ if st.checkbox("Simpan rekod minit (lokal JSON)"):
 
 st.markdown("---")
 st.write("Versi: 1.1 — Multi-Template (AJK / Lajnah / Retreat).")
+
 
 
