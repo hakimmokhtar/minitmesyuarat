@@ -71,8 +71,8 @@ for i, ajk in enumerate(AJK_LIST):
 
 jumlah_kehadiran = st.text_input("Jumlah kehadiran (contoh: 12 / 15)", value="")
 
-    # Agenda list
-    st.markdown("### Agenda")
+# Agenda list
+st.markdown("### Agenda")
     agenda_text = st.text_area(
     "Senarai Agenda (satu baris = satu agenda)",
     value="",
@@ -205,6 +205,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
