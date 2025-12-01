@@ -165,13 +165,13 @@ agenda_text = st.text_area(
 agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
     # Perbincangan
-elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
-        for idx, ag in enumerate(agenda, start=1):
+    elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
+    for idx, ag in enumerate(agenda, start=1):
             elems.append(Paragraph(f"<b>{idx}. {ag['title']}</b>", normal))
             lines = [ln.strip() for ln in (ag['notes'] or "").splitlines() if ln.strip()]
-        if lines:
-            for ln in lines:
-                elems.append(Paragraph(ln, normal))
+            if lines:
+                for ln in lines:
+                    elems.append(Paragraph(ln, normal))
         else:
             elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
@@ -212,6 +212,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
