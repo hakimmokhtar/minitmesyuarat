@@ -144,7 +144,7 @@ def build_pdf():
     for r in att_rows:
         table_data.append([r["no"], r["jawatan"], r["nama"], r["hadir"], r["cat"]])
 
-    tbl = Table(table_data, colWidths=[12*mm, 40*mm, 70*mm, 18*mm, 30*mm])
+    tbl = Table(table_data, colWidths=[12*mm, 70*mm, 40*mm, 18*mm, 30*mm])
     tbl.setStyle(TableStyle([
         ('GRID',(0,0),(-1,-1),0.4,colors.grey),
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
@@ -204,4 +204,5 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
