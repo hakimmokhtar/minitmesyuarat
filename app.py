@@ -8,6 +8,7 @@ from reportlab.lib import colors
 from io import BytesIO
 from PIL import Image as PILImage
 from datetime import date
+from reportlab.lib.styles import ParagraphStyle
 
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
@@ -200,13 +201,24 @@ def build_pdf():
     elems.append(Paragraph(penutup or "-", normal))
     elems.append(Spacer(1,14))
 
+    # Definisi style baru
+    signature_style = ParagraphStyle(
+    name="Signature",
+    fontName="BrushScriptMT",  # nama font ReportLab
+    fontSize=12,
+    leading=14
+    )
+
+# Gunakan style itu
+elems.append(Paragraph(f"{nama_su}", signature_style))
     # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
     elems.append(Paragraph(sign_line, normal))
-    elems.append(Paragraph(f"{nama_su}", Brush Script MT))
+    elems.append(Paragraph(f"{nama_su}", "Brush Script MT"))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
+    
     doc.build(elems)
     buffer.seek(0)
     return buffer
@@ -220,6 +232,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
