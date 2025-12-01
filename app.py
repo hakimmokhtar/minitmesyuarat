@@ -218,10 +218,7 @@ def build_pdf(logo_file=None):
 if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
-    else:
-        st.success("PDF berjaya dihasilkan.")
-        st.download_button("Muat Turun Minit (PDF)",
-                           file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
