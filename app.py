@@ -69,22 +69,14 @@ for i, ajk in enumerate(AJK_LIST):
         "cat": catatan
     })
 
-jumlah_kehadiran = st.text_input("Jumlah kehadiran (contoh: 12 / 15)", value="")
-
-# Agenda list
-st.markdown("### Agenda")
+# ======== Agenda Input ========
+st.markdown("### Senarai Agenda")
 agenda_text = st.text_area(
     "Senarai Agenda (satu baris = satu agenda)",
     value="",
     height=150
 )
 agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
-
-# Agenda list
-elems.append(Paragraph("<b>AGENDA</b>", h2))
-for i, ag in enumerate(agenda, start=1):
-    elems.append(Paragraph(f"{i}) {ag['title']}", normal))
-elems.append(Spacer(1,8))
 
 # ======== Hal-hal berbangkit dan Penutup ========
 hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
@@ -158,35 +150,45 @@ def build_pdf():
     ]))
     elems.append(tbl)
     elems.append(Spacer(1,4))
-    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran or '-'}", normal))
+
+    # Auto jumlah kehadiran
+    jumlah_kehadiran_auto = sum(1 for r in att_rows if r["hadir"] == "/")
+    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran_auto} / {len(att_rows)}", normal))
     elems.append(Spacer(1,8))
 
-
+    # Agenda
+    elems.append(Paragraph("<b>AGENDA</b>", h2))
+    for i, ag in enumerate(agenda, start=1):
+        elems.append(Paragraph(f"{i}) {ag['title']}", normal))
+    elems.append(Spacer(1,8))
 
     # Perbincangan
     elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
     for idx, ag in enumerate(agenda, start=1):
-            elems.append(Paragraph(f"<b>{idx}. {ag['title']}</b>", normal))
-            lines = [ln.strip() for ln in (ag['notes'] or "").splitlines() if ln.strip()]
-            if lines:
-                for ln in lines:
-                    elems.append(Paragraph(ln, normal))
-    else:
-        elems.append(Paragraph("-", normal))
+        elems.append(Paragraph(f"<b>{idx}. {ag['title']}</b>", normal))
+        lines = [ln.strip() for ln in (ag['notes'] or "").splitlines() if ln.strip()]
+        if lines:
+            for ln in lines:
+                elems.append(Paragraph(ln, normal))
+        else:
+            elems.append(Paragraph("-", normal))
         elems.append(Spacer(1,4))
 
+    # Hal-hal berbangkit
     elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
     if hal_berbangkit.strip():
         for ln in hal_berbangkit.splitlines():
             elems.append(Paragraph(ln, normal))
     else:
         elems.append(Paragraph("-", normal))
-
     elems.append(Spacer(1,10))
+
+    # Penutup
     elems.append(Paragraph("<b>PENUTUP</b>", h2))
     elems.append(Paragraph(penutup or "-", normal))
     elems.append(Spacer(1,14))
 
+    # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
     sign_line = "__________________________"
@@ -194,13 +196,9 @@ def build_pdf():
     elems.append(Paragraph(f"{nama_su}", normal))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
-    elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
-
     doc.build(elems)
     buffer.seek(0)
     return buffer
-
-    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran_auto} / {len(att_rows)}", normal))
 
 # ======== Generate Button ========
 if st.button("Generate PDF"):
@@ -211,23 +209,3 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
