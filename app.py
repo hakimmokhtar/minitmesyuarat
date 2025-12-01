@@ -166,7 +166,7 @@ tbl.setStyle(TableStyle([
     ('RIGHTPADDING', (0,0), (-1,-1), 3),
 ]))
 
-    tbl.setStyle(TableStyle([
+tbl.setStyle(TableStyle([
         ('GRID',(0,0),(-1,-1),0.4,colors.grey),
         ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
         ('VALIGN',(0,0),(-1,-1),'MIDDLE')
@@ -225,4 +225,5 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
