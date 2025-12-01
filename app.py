@@ -156,10 +156,13 @@ def build_pdf():
     elems.append(Spacer(1,8))
 
     # Agenda list
-    elems.append(Paragraph("<b>AGENDA</b>", h2))
-    for i, ag in enumerate(agenda, start=1):
-        elems.append(Paragraph(f"{i}) {ag['title']}", normal))
-    elems.append(Spacer(1,8))
+st.markdown("### Agenda")
+agenda_text = st.text_area(
+    "Senarai Agenda (satu baris = satu agenda)",
+    value="",
+    height=150
+)
+agenda = [{"title": line.strip(), "notes": ""} for line in agenda_text.splitlines() if line.strip()]
 
     # Perbincangan
     elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
@@ -187,13 +190,18 @@ def build_pdf():
 
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
-    elems.append(Paragraph("…………………………………….", normal))
+    sign_line = "__________________________"
+    elems.append(Paragraph(sign_line, normal))
     elems.append(Paragraph(f"{nama_su}", normal))
+    elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
+
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
     doc.build(elems)
     buffer.seek(0)
     return buffer
+
+elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran_auto} / {len(att_rows)}", normal))
 
 # ======== Generate Button ========
 if st.button("Generate PDF"):
@@ -204,6 +212,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
