@@ -208,13 +208,13 @@ def build_pdf():
     return buffer
 
     def build_pdf(logo_file=None):  # <-- tambah parameter
-    ...
-    if logo_file is not None:  # <-- check dulu
-        img_bio = get_reportlab_image(logo_file, max_width_mm=30)
-        if img_bio:
-            img = Image(img_bio)
-            img.drawHeight = 22*mm
-            elems.append(img)
+    
+        if logo_file is not None:  # <-- check dulu
+            img_bio = get_reportlab_image(logo_file, max_width_mm=30)
+            if img_bio:
+                img = Image(img_bio)
+                img.drawHeight = 22*mm
+                elems.append(img)
 
     
 
@@ -227,6 +227,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
