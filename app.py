@@ -23,6 +23,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     masa = st.text_input("Masa", value="9:00 PM")
     tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
     nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
+    logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
     
     
 
@@ -218,6 +219,15 @@ def build_pdf(logo_file=None):
 if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
+
+    else:
+        pdf_buf = build_pdf(logo_file)  # hantar logo_file
+        st.success("PDF berjaya dihasilkan.")
+        st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
+                           file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
+
+
 
 
 
