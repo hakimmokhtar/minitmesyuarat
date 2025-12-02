@@ -23,7 +23,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     masa = st.text_input("Masa", value="9:00 PM")
     tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
     nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
-    sign_su = st.text_input("Nama SU (Disediakan oleh)", value="")
+    sign_su = st.text_input("Nama Sign", value="")
     logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
 
     
@@ -235,6 +235,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
