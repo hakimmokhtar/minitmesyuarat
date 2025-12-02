@@ -20,7 +20,7 @@ template = st.selectbox("Pilih Template Mesyuarat", ["Harian", "EXCO"])
 with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     bil = st.text_input("BIL. (contoh: 3)", value="")
     tarikh = st.date_input("Tarikh :", value=date.today())
-    masa = st.text_input("Masa : (contoh: 9 malam)", value="")
+    masa = st.text_input("Masa : (contoh: 9 pm)", value="")
     tempat = st.text_input("Tempat/Platform :", value="")
     nama_anda = st.text_input("Disediakan oleh : (contoh: Muhammad Hakim bin Mokhtar)", value="")
     jawatan_anda = st.text_input("Jawatan : (contoh: Setiausaha DPPKR)", value="")
@@ -219,6 +219,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
