@@ -194,7 +194,7 @@ def build_pdf(logo_file=None):
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,20))
     elems.append(Paragraph(f"<b>{sign_anda}</b>", signature_style))
-    sign_line = "__________________________"
+    sign_line = "________________"
     elems.append(Paragraph(sign_line, normal))
     elems.append(Spacer(1,8))
     elems.append(Paragraph(f"<b>{nama_anda}</b>", normal))
@@ -202,13 +202,17 @@ def build_pdf(logo_file=None):
 
 
     doc.build(elems)
-
     buffer.seek(0)
     return buffer
 
 # ======== Generate Button ========
 if st.button("Generate PDF"):
-    if not nama_anda:
+    if not bil:
+    if not tarikh:
+    if not masa:
+    if not tempat:
+    if not jawatan_anda:
+    if not sign_anda:
         st.warning("Sila isi nama SU sebelum generate PDF.")
     else:
         pdf_buf = build_pdf()  # Hantar logo_file ke fungsi
@@ -219,6 +223,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
