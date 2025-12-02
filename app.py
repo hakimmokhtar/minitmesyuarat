@@ -207,7 +207,9 @@ def build_pdf(logo_file=None):
 
 # ======== Generate Button ========
 if st.button("Generate PDF"):
-    if not bil, tarikh, masa, tempat, jawatan_anda, sign_anda:
+    if not all([bil, tarikh, masa, tempat, nama_anda, jawatan_anda, sign_anda]):
+        st.warning("Sila lengkapkan semua maklumat.")
+
         st.warning("Sila isi nama SU sebelum generate PDF.")
     
     else:
@@ -219,6 +221,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
