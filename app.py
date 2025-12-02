@@ -24,7 +24,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     tempat = st.text_input("Tempat", value="")
     nama_anda = st.text_input("Disediakan oleh (contoh: Muhammad Hakim bin Mokhtar)", value="")
     jawatan_anda = st.text_input("Jawatan (contoh: Setiausaha DPPKR)", value="")
-    sign_anda = st.text_input("contoh: Hakim", value="")
+    sign_anda = st.text_input("Nama Sign (contoh: Hakim)", value="")
     
     
 
@@ -80,7 +80,7 @@ num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value
 agenda = []
 for i in range(int(num_agenda)):
     title = st.text_input(f"Agenda {i+1}", key=f"agenda_title_{i}")
-    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
+    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: {i+1}.1, {i+1}.1, ...)", key=f"agenda_notes_{i}")
     agenda.append({"title": title, "notes": notes})
 
 
@@ -217,6 +217,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
