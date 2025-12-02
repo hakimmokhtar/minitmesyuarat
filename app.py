@@ -8,7 +8,8 @@ from reportlab.lib import colors
 from io import BytesIO
 from PIL import Image as PILImage
 from datetime import date
-from PyPDF2 import PdfReader, PdfWriter
+from pdfrw import PdfReader, PdfWriter, PageMerge
+
 
 
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
@@ -123,25 +124,27 @@ def build_pdf_body():
     return buffer
 
     def merge_with_letterhead(body_pdf, letterhead_pdf):
-        body = PdfReader(body_pdf)
         letter = PdfReader(letterhead_pdf)
+        body = PdfReader(body_pdf)
 
         writer = PdfWriter()
 
-        # Page 1 – merge letterhead + body
-        base = letter.pages[0]
-        content = body.pages[0]
-        base.merge_page(content)
-        writer.add_page(base)
+        # Page 1: merge
+        first_letter = letter.pages[0]
+        first_body = body.pages[0]
 
-        # Page 2+ kalau ada
-        for i in range(1, len(body.pages)):
-            writer.add_page(body.pages[i])
+        PageMerge(first_letter).add(first_body).render()
+        writer.addpage(first_letter)
 
-        out_buffer = BytesIO()
-        writer.write(out_buffer)
-        out_buffer.seek(0)
-        return out_buffer
+        # Page 2+
+        for page in body.pages[1:]:
+            writer.addpage(page)
+
+        out = BytesIO()
+        writer.write(out)
+        out.seek(0)
+        return out
+
 
     elems.append(Paragraph("Jabatan Setiausaha", h1))
     elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
@@ -250,6 +253,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_{bil}_{tarikh}.pdf",
             mime="application/pdf"
         )
+
 
 
 
