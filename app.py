@@ -20,11 +20,11 @@ template = st.selectbox("Pilih Template Mesyuarat", ["Harian", "EXCO"])
 with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     bil = st.text_input("BIL. (contoh: 3)", value="")
     tarikh = st.date_input("Tarikh :", value=date.today())
-    masa = st.text_input("Masa :", value="")
+    masa = st.text_input("Masa : (contoh: 9 malam)", value="")
     tempat = st.text_input("Tempat/Platform :", value="")
-    nama_anda = st.text_input("Disediakan oleh :", value="")
-    jawatan_anda = st.text_input("Jawatan :", value="")
-    sign_anda = st.text_input("Nama Sign :", value="")
+    nama_anda = st.text_input("Disediakan oleh : (contoh: Muhammad Hakim bin Mokhtar)", value="")
+    jawatan_anda = st.text_input("Jawatan : (contoh: Setiausaha DPPKR)", value="")
+    sign_anda = st.text_input("Nama Sign : (contoh: hakim)", value="")
     
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
@@ -78,7 +78,7 @@ num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value
 
 agenda = []
 for i in range(int(num_agenda)):
-    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
+    title = st.text_input(f"Agenda {i+1}", key=f"agenda_title_{i}")
     notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
     agenda.append({"title": title, "notes": notes})
 
@@ -219,6 +219,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
