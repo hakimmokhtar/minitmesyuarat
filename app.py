@@ -186,17 +186,18 @@ def build_pdf(logo_file=None, bg_file=None):
     signature_style = ParagraphStyle(
         name="Signature",
         fontName="Helvetica-Oblique",  # boleh tukar ke BrushScriptMT kalau font ada
-        fontSize=12,
+        fontSize=25,
         leading=14
     )
 
     # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
-    elems.append(Spacer(1,8))
+    elems.append(Spacer(1,20))
+    elems.append(Paragraph(f"<b>{sign_anda}<b>", signature_style))
     sign_line = "__________________________"
-    elems.append(Paragraph(sign_line, normal))
-    elems.append(Paragraph(f"{nama_su}", signature_style))
-    elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
+    elems.append(Paragraph(<b>sign_line<b>, normal))
+    elems.append(Paragraph(f"<b>{nama_anda}<b/>", normal))
+    elems.append(Paragraph(f"<b>{jawatan_anda}<b>", normal))
 
     doc.build(
     elems, 
@@ -209,7 +210,7 @@ def build_pdf(logo_file=None, bg_file=None):
 
 # ======== Generate Button ========
 if st.button("Generate PDF"):
-    if not nama_su:
+    if not nama_anda:
         st.warning("Sila isi nama SU sebelum generate PDF.")
 
     else:
@@ -217,6 +218,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
