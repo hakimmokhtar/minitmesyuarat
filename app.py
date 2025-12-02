@@ -238,14 +238,15 @@ def build_pdf(logo_file=None, bg_file=None):
 
 # ======== Generate Button ========
 if st.button("Generate PDF"):
-    if not nama_anda:
-        st.warning("Sila isi nama SU sebelum generate PDF.")
+    if not all([bil, tarikh, masa, tempat, nama_anda, jawatan_anda, sign_anda]):
+         st.warning("Sila lengkapkan semua maklumat.")
 
     else:
         pdf_buf = build_pdf(logo_file=None, bg_file=None)
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
