@@ -4,10 +4,14 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 from reportlab.lib import colors
 from io import BytesIO
 from PIL import Image as PILImage
 from datetime import date
+
+
 
 
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
@@ -154,8 +158,7 @@ def build_pdf(logo_file=None, letterhead=None):
 
     elems = []
 
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.utils import ImageReader
+
 
     # --- Semua content minit ----
     elems.append(Paragraph("Jabatan Setiausaha", h1))
@@ -294,6 +297,7 @@ if st.button("Generate PDF"):
             file_name="minit.pdf",
             mime="application/pdf"
         )
+
 
 
 
