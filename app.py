@@ -30,8 +30,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     nama_anda = st.text_input("Disediakan oleh : (contoh: Muhammad Hakim bin Mokhtar)", value="")
     jawatan_anda = st.text_input("Jawatan : (contoh: Setiausaha DPPKR)", value="")
     sign_anda = st.text_input("Nama Sign : (contoh: hakim)", value="")
-    letterhead_image = st.file_uploader("Upload Letterhead (PNG)", type=["png"])
-
+    
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
 st.markdown("### Kehadiran AJK")
