@@ -12,8 +12,6 @@ from PIL import Image as PILImage
 from datetime import date
 
 
-
-
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
 st.write("Pilih template mesyuarat → isi borang → klik **Generate PDF** untuk muat turun minit mengikut format rasmi.")
@@ -30,6 +28,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     nama_anda = st.text_input("Disediakan oleh : (contoh: Muhammad Hakim bin Mokhtar)", value="")
     jawatan_anda = st.text_input("Jawatan : (contoh: Setiausaha DPPKR)", value="")
     sign_anda = st.text_input("Nama Sign : (contoh: hakim)", value="")
+    letterhead_image = st.file_uploader("Upload Letterhead (PNG)", type=["png"])
     
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
@@ -296,6 +295,7 @@ if st.button("Generate PDF"):
             file_name="minit.pdf",
             mime="application/pdf"
         )
+
 
 
 
