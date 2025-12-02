@@ -212,6 +212,7 @@ def build_pdf(logo_file=None):
     sign_line = "__________________________"
     elems.append(Paragraph(sign_line, normal))
     elems.append(Paragraph(f"{nama_su}", signature_style))
+    elems.append(Spacer(1,8))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
     doc.build(elems)
@@ -232,6 +233,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
