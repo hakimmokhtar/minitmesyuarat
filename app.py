@@ -218,7 +218,7 @@ def build_pdf(logo_file=None, bg_file=None):
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,20))
     elems.append(Paragraph(f"<b>{sign_anda}</b>", signature_style))
-    sign_line = "__________________________"
+    sign_line = "_ _ _ _ _ _ _ _ _ _"
     elems.append(Paragraph(sign_line, normal))
     elems.append(Paragraph(f"<b>{nama_anda}</b>", normal))
     elems.append(Paragraph(f"<b>{jawatan_anda}</b>", normal))
@@ -242,6 +242,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
