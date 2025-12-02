@@ -25,7 +25,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     nama_anda = st.text_input("Disediakan oleh (contoh: Muhammad Hakim bin Mokhtar)", value="")
     jawatan_anda = st.text_input("Jawatan (contoh: Setiausaha DPPKR)", value="")
     sign_anda = st.text_input("Nama Sign (contoh: Hakim)", value="")
-    bg_file = st.file_uploader("Upload Background Letterhead (PNG)", type=["png"])
+    bg_file = st.file_uploader("", type=["png"])
 
     
     
@@ -220,6 +220,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
