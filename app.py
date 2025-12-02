@@ -110,7 +110,8 @@ def get_reportlab_image(file, max_width_mm=30):
 
 
 # ======== PDF Builder ========
-    pdf_buf = build_pdf(logo_file)
+
+def build_pdf(logo_file=None):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
                             rightMargin=18*mm, leftMargin=18*mm,
@@ -223,15 +224,17 @@ if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
     else:
-        # bina PDF
-        pdf_buf = build_pdf(logo_file)
+        pdf_buf = build_pdf(logo_file)  # Hantar logo_file ke fungsi
         st.success("PDF berjaya dihasilkan.")
         st.download_button(
             label="Muat Turun Minit (PDF)",
-            data=pdf_buf.getvalue(),   # <-- WAJIB, mesti bytes
+            data=pdf_buf.getvalue(),   # WAJIB .getvalue() supaya Streamlit terima bytes
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
+        )
+
 
 
 
