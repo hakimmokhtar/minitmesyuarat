@@ -21,11 +21,10 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     bil = st.text_input("BIL. (contoh: 3)", value="")
     tarikh = st.date_input("Tarikh", value=date.today())
     masa = st.text_input("Masa", value="9:00 PM")
-    tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
-    nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
-    logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
-    
-
+    tempat = st.text_input("Tempat", value="")
+    nama_anda = st.text_input("Disediakan oleh (contoh: Muhammad Hakim bin Mokhtar)", value="")
+    jawatan_anda = st.text_input("Jawatan (contoh: Setiausaha DPPKR)", value="")
+    sign_anda = st.text_input("contoh: Hakim", value="")
     
     
 
@@ -80,7 +79,7 @@ num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value
 
 agenda = []
 for i in range(int(num_agenda)):
-    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
+    title = st.text_input(f"Agenda {i+1}", key=f"agenda_title_{i}")
     notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
     agenda.append({"title": title, "notes": notes})
 
@@ -88,34 +87,12 @@ for i in range(int(num_agenda)):
 
 
 # ======== Hal-hal berbangkit dan Penutup ========
-hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
+hal_berbangkit = st.text_area("Hal-hal Berbangkit", value="")
 penutup = st.text_area(
     "Penutup",
     value="Mesyuarat diakhiri dengan tasbih kafarah & Surah Al-Asr"
 )
 
-# ======== Helper: Logo scaling ========
-def get_reportlab_image(file, max_width_mm=30):
-    if not file:
-        return None
-    img = PILImage.open(file)
-    max_w_px = int(max_width_mm * (72/25.4))
-    w, h = img.size
-    if w > max_w_px:
-        ratio = max_w_px / w
-        img = img.resize((int(w*ratio), int(h*ratio)))
-    bio = BytesIO()
-    img.save(bio, format='PNG')
-    bio.seek(0)
-    return bio
-from reportlab.lib.utils import ImageReader
-
-def draw_bg(canvas_obj, doc, bg_image):
-    if bg_image:
-        canvas_obj.saveState()
-        img = ImageReader(bg_image)
-        canvas_obj.drawImage(img, 0, 0, width=A4[0], height=A4[1])
-        canvas_obj.restoreState()
 
 # ======== PDF Builder ========
 def build_pdf(logo_file=None, bg_file=None):
