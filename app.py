@@ -198,7 +198,7 @@ def build_pdf(logo_file=None):
     elems.append(Paragraph(sign_line, normal))
     elems.append(Spacer(1,8))
     elems.append(Paragraph(f"<b>{nama_anda}</b>", normal))
-    elems.append(Paragraph(f"<b>{jawatan_anda</b>}", normal))
+    elems.append(Paragraph(f"<b>{jawatan_anda}</b>", normal))
 
 
     doc.build(elems)
@@ -219,6 +219,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
