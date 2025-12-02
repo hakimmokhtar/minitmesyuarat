@@ -110,7 +110,6 @@ def get_reportlab_image(file, max_width_mm=30):
 
 
 # ======== PDF Builder ========
-def build_pdf :
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
                             rightMargin=18*mm, leftMargin=18*mm,
@@ -227,6 +226,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", 
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
