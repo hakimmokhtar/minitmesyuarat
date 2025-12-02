@@ -208,6 +208,13 @@ def build_pdf(logo_file=None):
         leading=14
     )
 
+    normal = ParagraphStyle(
+    name='NormalCustom',
+    fontName='Helvetica',  # atau Arial
+    fontSize=10,
+    leading=12
+)
+
     # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
     elems.append(Spacer(1,8))
@@ -236,6 +243,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
