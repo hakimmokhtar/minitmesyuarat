@@ -286,7 +286,7 @@ if st.button("Generate PDF"):
         st.warning("Sila lengkapkan semua maklumat.")
     
     else:
-        pdf_buf = build_pdf(logo_file, letterhead_image)
+        pdf_buf = build_pdf(letterhead_image)
         st.success("PDF berjaya.")
         st.download_button(
             "Muat Turun Minit",
@@ -294,6 +294,7 @@ if st.button("Generate PDF"):
             file_name="minit.pdf",
             mime="application/pdf"
         )
+
 
 
 
