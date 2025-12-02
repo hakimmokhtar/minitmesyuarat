@@ -97,6 +97,28 @@ penutup = st.text_area(
 
 
 # ======== PDF Builder ========
+
+def draw_bg(canvas, doc, bg_file):
+    if bg_file is None:
+        return
+
+    canvas.saveState()
+    canvas.drawImage(
+        bg_file, 
+        0, 0,
+        width=A4[0],
+        height=A4[1],
+        preserveAspectRatio=True,
+        mask='auto'
+    )
+    canvas.restoreState()
+
+def draw_bg(canvas, doc, bg_file):
+    if bg_file is None:
+        return
+    canvas.saveState()
+    canvas.drawImage(bg_file, 0, 0, width=A4[0], height=A4[1])
+    canvas.restoreState()
 def build_pdf(logo_file=None, bg_file=None):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
@@ -220,6 +242,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
