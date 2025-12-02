@@ -11,6 +11,8 @@ from datetime import date
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+pdfmetrics.registerFont(TTFont('MrDafoe', 'MrDafoe-Regular.ttf'))
+
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
 st.write("Pilih template mesyuarat → isi borang → klik **Generate PDF** untuk muat turun minit mengikut format rasmi.")
@@ -211,7 +213,7 @@ def build_pdf(logo_file=None, bg_file=None):
     # Signature style
     signature_style = ParagraphStyle(
         name="Signature",
-        fontName="MrDafoe-Regular.ttf",  # boleh tukar ke BrushScriptMT kalau font ada
+        fontName="MrDafoe",  # boleh tukar ke BrushScriptMT kalau font ada
         fontSize=25,
         leading=14
     )
@@ -244,6 +246,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
