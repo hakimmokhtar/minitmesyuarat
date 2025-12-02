@@ -223,13 +223,12 @@ if st.button("Generate PDF"):
         st.warning("Sila isi nama SU sebelum generate PDF.")
     else:
         st.success("PDF berjaya dihasilkan.")
-
         st.download_button(
             label="Muat Turun Minit (PDF)",
-            data=pdf_buf.getvalue(),        # <-- WAJIB: guna bytes
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
