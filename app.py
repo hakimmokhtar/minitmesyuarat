@@ -201,7 +201,7 @@ def build_pdf(logo_file=None):
     # Signature style
     signature_style = ParagraphStyle(
         name="Signature",
-        fontName="BrushScriptMT",  # boleh tukar ke BrushScriptMT kalau font ada
+        fontName="Helvetica-Oblique",  # boleh tukar ke BrushScriptMT kalau font ada
         fontSize=20,
         leading=14
     )
@@ -232,6 +232,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
