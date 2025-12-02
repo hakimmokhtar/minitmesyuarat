@@ -226,9 +226,8 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button(
             "Muat Turun Minit (PDF)",
-            file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
-            mime="application/pdf"
     )
+
 
 
 
