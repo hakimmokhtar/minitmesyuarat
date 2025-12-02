@@ -8,6 +8,8 @@ from reportlab.lib import colors
 from io import BytesIO
 from PIL import Image as PILImage
 from datetime import date
+from PyPDF2 import PdfReader, PdfWriter
+
 
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
@@ -25,6 +27,8 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     nama_anda = st.text_input("Disediakan oleh : (contoh: Muhammad Hakim bin Mokhtar)", value="")
     jawatan_anda = st.text_input("Jawatan : (contoh: Setiausaha DPPKR)", value="")
     sign_anda = st.text_input("Nama Sign : (contoh: hakim)", value="")
+    letterhead_pdf = st.file_uploader("Upload Letterhead (PDF)", type=["pdf"])
+
     
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
@@ -95,24 +99,49 @@ penutup = st.text_area(
 
 # ======== PDF Builder ========
 
-def build_pdf(logo_file=None):
+def build_pdf_body():
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
                             rightMargin=18*mm, leftMargin=18*mm,
                             topMargin=18*mm, bottomMargin=18*mm)
+
     styles = getSampleStyleSheet()
-    normal = styles['Normal']
-    h1 = ParagraphStyle(name='CenterTitle', fontSize=12, leading=14, alignment=1, spaceAfter=6)
-    h2 = ParagraphStyle(name='SmallBold', fontSize=10, leading=12, spaceAfter=4)
+    normal = styles["Normal"]
+    h1 = ParagraphStyle(name='CenterTitle', fontSize=12, alignment=1, spaceAfter=6)
+    h2 = ParagraphStyle(name='Header2', fontSize=10, spaceAfter=4)
+
     elems = []
 
-    # Header
-    if logo_file is not None:
-        img_bio = get_reportlab_image(logo_file, max_width_mm=30)
-        if img_bio:
-            img = Image(img_bio)
-            img.drawHeight = 22*mm
-            elems.append(img)
+    # --- Semua content minit ----
+    elems.append(Paragraph("Jabatan Setiausaha", h1))
+    elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
+    elems.append(Paragraph("<b>MINIT MESYUARAT</b>", h1))
+    # … (SEMUA kod minit kekal seperti biasa)
+
+    doc.build(elems)
+    buffer.seek(0)
+    return buffer
+
+    def merge_with_letterhead(body_pdf, letterhead_pdf):
+    body = PdfReader(body_pdf)
+    letter = PdfReader(letterhead_pdf)
+
+    writer = PdfWriter()
+
+    # Page 1 – merge letterhead + body
+    base = letter.pages[0]
+    content = body.pages[0]
+    base.merge_page(content)
+    writer.add_page(base)
+
+    # Page 2+ kalau ada
+    for i in range(1, len(body.pages)):
+        writer.add_page(body.pages[i])
+
+    out_buffer = BytesIO()
+    writer.write(out_buffer)
+    out_buffer.seek(0)
+    return out_buffer
 
     elems.append(Paragraph("Jabatan Setiausaha", h1))
     elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
@@ -211,15 +240,16 @@ if st.button("Generate PDF"):
         st.warning("Sila lengkapkan semua maklumat.")
     
     else:
-        pdf_buf = build_pdf()  # Hantar logo_file ke fungsi
-        st.success("PDF berjaya dihasilkan.")
+        body_pdf = build_pdf_body()
+        final_pdf = merge_with_letterhead(body_pdf, letterhead_pdf)
+
+        st.success("PDF selesai dijana!")
         st.download_button(
-            label="Muat Turun Minit (PDF)",
-            data=pdf_buf.getvalue(),   # WAJIB .getvalue() supaya Streamlit terima bytes
-            file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
+            "Download PDF",
+            data=final_pdf,
+            file_name=f"minit_{bil}_{tarikh}.pdf",
             mime="application/pdf"
         )
-
 
 
 
