@@ -25,7 +25,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     nama_anda = st.text_input("Disediakan oleh :", value="")
     jawatan_anda = st.text_input("Jawatan :", value="")
     sign_su = st.text_input("Nama Sign :", value="")
-    logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
+    
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
 st.markdown("### Kehadiran AJK")
@@ -240,6 +240,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
