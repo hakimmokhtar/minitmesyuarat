@@ -213,7 +213,7 @@ def build_pdf(logo_file=None, bg_file=None):
     elems.append(Paragraph(f"{nama_su}", signature_style))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
-doc.build(elems)
+    doc.build(elems)
 
     buffer.seek(0)
     return buffer
@@ -222,6 +222,7 @@ doc.build(elems)
 if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
+
 
 
 
