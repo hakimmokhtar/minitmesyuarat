@@ -221,12 +221,18 @@ def get_reportlab_image(file, max_width_mm=30):
 if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
-
     else:
+        pdf_buf = build_pdf(logo_file, bg_file)
+
         st.success("PDF berjaya dihasilkan.")
+
         st.download_button(
-            "Muat Turun Minit (PDF)",
-    )
+            label="Muat Turun Minit (PDF)",
+            data=pdf_buf.getvalue(),        # <-- WAJIB: guna bytes
+            file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
+            mime="application/pdf"
+        )
+
 
 
 
