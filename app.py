@@ -222,12 +222,19 @@ if st.button("Generate PDF"):
     if not nama_su:
         st.warning("Sila isi nama SU sebelum generate PDF.")
     else:
+        # bina PDF
+        pdf_buf = build_pdf(logo_file)
+
         st.success("PDF berjaya dihasilkan.")
+
         st.download_button(
             label="Muat Turun Minit (PDF)",
+            data=pdf_buf.getvalue(),   # <-- WAJIB, mesti bytes
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
+
 
 
 
