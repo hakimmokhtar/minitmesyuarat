@@ -18,17 +18,14 @@ template = st.selectbox("Pilih Template Mesyuarat", ["Harian", "EXCO"])
 
 # --- Common header inputs ---
 with st.expander("Maklumat Umum Mesyuarat", expanded=True):
-    bil = st.text_input("BIL. (contoh: 3)", value="")
+    bil = st.text_input("BIL MESYUARAT. (contoh: 3)", value="")
     tarikh = st.date_input("Tarikh", value=date.today())
-    masa = st.text_input("Masa", value="9:00 PM")
-    tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
-    nama_su = st.text_input("Disediakan oleh", value="")
+    masa = st.text_input("Masa", value="")
+    tempat = st.text_input("Tempat/Platform", value="")
+    nama_anda = st.text_input("Disediakan oleh", value="")
     jawatan_anda = st.text_input("Jawatan", value="")
     sign_su = st.text_input("Nama Sign", value="")
     logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
-
-    
-    
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
 st.markdown("### Kehadiran AJK")
@@ -222,7 +219,7 @@ def build_pdf(logo_file=None):
     elems.append(Paragraph(sign_line, normal))
     elems.append(Paragraph(f"{sign_su}", signature_style))
     elems.append(Spacer(1,8))
-    elems.append(Paragraph(f"{nama_su}", normal))
+    elems.append(Paragraph(f"{nama_anda}", normal))
     elems.append(Paragraph(f"{jawatan_anda}", normal))
 
     doc.build(elems)
@@ -243,6 +240,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
