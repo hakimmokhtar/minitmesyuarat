@@ -23,6 +23,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     masa = st.text_input("Masa", value="9:00 PM")
     tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
     nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
+    sign_su = st.text_input("Nama SU (Disediakan oleh)", value="")
     logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
 
     
@@ -211,8 +212,9 @@ def build_pdf(logo_file=None):
     elems.append(Spacer(1,8))
     sign_line = "__________________________"
     elems.append(Paragraph(sign_line, normal))
-    elems.append(Paragraph(f"{nama_su}", signature_style))
+    elems.append(Paragraph(f"{sign_su}", signature_style))
     elems.append(Spacer(1,8))
+    elems.append(Paragraph(f"{nama_su}", normal))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
     doc.build(elems)
@@ -233,6 +235,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
