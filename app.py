@@ -123,25 +123,25 @@ def build_pdf_body():
     return buffer
 
     def merge_with_letterhead(body_pdf, letterhead_pdf):
-    body = PdfReader(body_pdf)
-    letter = PdfReader(letterhead_pdf)
+        body = PdfReader(body_pdf)
+        letter = PdfReader(letterhead_pdf)
 
-    writer = PdfWriter()
+        writer = PdfWriter()
 
-    # Page 1 – merge letterhead + body
-    base = letter.pages[0]
-    content = body.pages[0]
-    base.merge_page(content)
-    writer.add_page(base)
+        # Page 1 – merge letterhead + body
+        base = letter.pages[0]
+        content = body.pages[0]
+        base.merge_page(content)
+        writer.add_page(base)
 
-    # Page 2+ kalau ada
-    for i in range(1, len(body.pages)):
-        writer.add_page(body.pages[i])
+        # Page 2+ kalau ada
+        for i in range(1, len(body.pages)):
+            writer.add_page(body.pages[i])
 
-    out_buffer = BytesIO()
-    writer.write(out_buffer)
-    out_buffer.seek(0)
-    return out_buffer
+        out_buffer = BytesIO()
+        writer.write(out_buffer)
+        out_buffer.seek(0)
+        return out_buffer
 
     elems.append(Paragraph("Jabatan Setiausaha", h1))
     elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
@@ -250,6 +250,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_{bil}_{tarikh}.pdf",
             mime="application/pdf"
         )
+
 
 
 
