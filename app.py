@@ -24,7 +24,7 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     tempat = st.text_input("Tempat/Platform :", value="")
     nama_anda = st.text_input("Disediakan oleh :", value="")
     jawatan_anda = st.text_input("Jawatan :", value="")
-    sign_su = st.text_input("Nama Sign :", value="")
+    sign_anda = st.text_input("Nama Sign :", value="")
     
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
@@ -86,26 +86,11 @@ for i in range(int(num_agenda)):
 
 
 # ======== Hal-hal berbangkit dan Penutup ========
-hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
+hal_berbangkit = st.text_area("Hal-hal Berbangkit", value="")
 penutup = st.text_area(
     "Penutup",
     value="Mesyuarat diakhiri dengan tasbih kafarah & Surah Al-Asr"
 )
-
-# ======== Helper: Logo scaling ========
-def get_reportlab_image(file, max_width_mm=30):
-    if not file:
-        return None
-    img = PILImage.open(file)
-    max_w_px = int(max_width_mm * (72/25.4))
-    w, h = img.size
-    if w > max_w_px:
-        ratio = max_w_px / w
-        img = img.resize((int(w*ratio), int(h*ratio)))
-    bio = BytesIO()
-    img.save(bio, format='PNG')
-    bio.seek(0)
-    return bio
 
 
 # ======== PDF Builder ========
@@ -205,22 +190,16 @@ def build_pdf(logo_file=None):
         leading=14
     )
 
-    normal = ParagraphStyle(
-    name='NormalCustom',
-    fontName='Helvetica',  # atau Arial
-    fontSize=10,
-    leading=12
-)
-
     # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
-    elems.append(Spacer(1,8))
+    elems.append(Spacer(1,20))
+    elems.append(Paragraph(f"<b>{sign_anda}</b>", signature_style))
     sign_line = "__________________________"
     elems.append(Paragraph(sign_line, normal))
-    elems.append(Paragraph(f"{sign_su}", signature_style))
     elems.append(Spacer(1,8))
-    elems.append(Paragraph(f"{nama_anda}", normal))
-    elems.append(Paragraph(f"{jawatan_anda}", normal))
+    elems.append(Paragraph(f"<b>{nama_anda}</b>", normal))
+    elems.append(Paragraph(f"<b>{jawatan_anda<b/>}", normal))
+
 
     doc.build(elems)
 
@@ -240,6 +219,7 @@ if st.button("Generate PDF"):
             file_name=f"minit_BIL{bil or 'x'}_{tarikh.strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf"
         )
+
 
 
 
