@@ -8,8 +8,6 @@ from reportlab.lib import colors
 from io import BytesIO
 from PIL import Image as PILImage
 from datetime import date
-from pdfrw import PdfReader, PdfWriter, PageMerge
-
 
 
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
@@ -28,9 +26,8 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     nama_anda = st.text_input("Disediakan oleh : (contoh: Muhammad Hakim bin Mokhtar)", value="")
     jawatan_anda = st.text_input("Jawatan : (contoh: Setiausaha DPPKR)", value="")
     sign_anda = st.text_input("Nama Sign : (contoh: hakim)", value="")
-    letterhead_pdf = st.file_uploader("Upload Letterhead (PDF)", type=["pdf"])
+    letterhead_image = st.file_uploader("Upload Letterhead (PNG)", type=["png"])
 
-    
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
 st.markdown("### Kehadiran AJK")
@@ -100,18 +97,65 @@ penutup = st.text_area(
 
 # ======== PDF Builder ========
 
-def build_pdf_body():
+def build_pdf(logo_file=None, letterhead=None):
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4,
-                            rightMargin=18*mm, leftMargin=18*mm,
-                            topMargin=18*mm, bottomMargin=18*mm)
 
-    styles = getSampleStyleSheet()
-    normal = styles["Normal"]
-    h1 = ParagraphStyle(name='CenterTitle', fontSize=12, alignment=1, spaceAfter=6)
-    h2 = ParagraphStyle(name='Header2', fontSize=10, spaceAfter=4)
+    # create canvas
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    # ============= LETTERHEAD BACKGROUND =============
+    if letterhead is not None:
+        bg = ImageReader(letterhead)
+        c.drawImage(bg, 0, 0, width=width, height=height)
+
+    # ============= MULAKAN TULISAN =============  
+    text = c.beginText(40, height - 120)
+    text.setFont("Helvetica", 11)
+
+    text.textLine("Jabatan Setiausaha")
+    text.textLine("Dewan Pemuda PAS Kawasan Rembau")
+    text.textLine(f"MINIT MESYUARAT AJK — BIL {bil}")
+
+    text.textLine("")
+    text.textLine(f"Tarikh : {tarikh.strftime('%d %B %Y')}")
+    text.textLine(f"Masa   : {masa}")
+    text.textLine(f"Tempat : {tempat}")
+    text.textLine("")
+
+    # KEHADIRAN
+    text.textLine("KEHADIRAN:")
+    for r in att_rows:
+        text.textLine(f"{r['no']}. {r['jawatan']} - {r['nama']} [{r['hadir']}]")
+
+    # AGENDA
+    text.textLine("")
+    text.textLine("AGENDA:")
+    for i, ag in enumerate(agenda, start=1):
+        text.textLine(f"{i}. {ag['title']}")
+
+    # PENUTUP
+    text.textLine("")
+    text.textLine("PENUTUP:")
+    text.textLine(penutup)
+
+    # SIGNATURE
+    text.textLine("")
+    text.textLine("Disediakan oleh,")
+    text.textLine("")
+    text.textLine(nama_su)
+
+    c.drawText(text)
+    c.showPage()
+    c.save()
+
+    buffer.seek(0)
+    return buffer
 
     elems = []
+
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.utils import ImageReader
 
     # --- Semua content minit ----
     elems.append(Paragraph("Jabatan Setiausaha", h1))
@@ -232,7 +276,6 @@ def build_pdf_body():
     elems.append(Paragraph(f"<b>{nama_anda}</b>", normal))
     elems.append(Paragraph(f"<b>{jawatan_anda}</b>", normal))
 
-
     doc.build(elems)
     buffer.seek(0)
     return buffer
@@ -243,16 +286,15 @@ if st.button("Generate PDF"):
         st.warning("Sila lengkapkan semua maklumat.")
     
     else:
-        body_pdf = build_pdf_body()
-        final_pdf = merge_with_letterhead(body_pdf, letterhead_pdf)
-
-        st.success("PDF selesai dijana!")
+        pdf_buf = build_pdf(logo_file, letterhead_image)
+        st.success("PDF berjaya.")
         st.download_button(
-            "Download PDF",
-            data=final_pdf,
-            file_name=f"minit_{bil}_{tarikh}.pdf",
+            "Muat Turun Minit",
+            data=pdf_buf.getvalue(),
+            file_name="minit.pdf",
             mime="application/pdf"
         )
+
 
 
 
