@@ -24,6 +24,8 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
     nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
     logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
+    bg_file = st.file_uploader("Muat naik background (png/jpg)", type=["png","jpg","jpeg"])
+
     
     
 
@@ -106,9 +108,17 @@ def get_reportlab_image(file, max_width_mm=30):
     img.save(bio, format='PNG')
     bio.seek(0)
     return bio
+from reportlab.lib.utils import ImageReader
+
+def draw_bg(canvas_obj, doc, bg_image):
+    if bg_image:
+        canvas_obj.saveState()
+        img = ImageReader(bg_image)
+        canvas_obj.drawImage(img, 0, 0, width=A4[0], height=A4[1])
+        canvas_obj.restoreState()
 
 # ======== PDF Builder ========
-def build_pdf(logo_file=None):
+def build_pdf(logo_file=None, bg_file=None):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
                             rightMargin=18*mm, leftMargin=18*mm,
@@ -211,7 +221,12 @@ def build_pdf(logo_file=None):
     elems.append(Paragraph(f"{nama_su}", signature_style))
     elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
-    doc.build(elems)
+    doc.build(
+    elems, 
+    onFirstPage=lambda c, d: draw_bg(c, d, bg_file),
+    onLaterPages=lambda c, d: draw_bg(c, d, bg_file)
+)
+
     buffer.seek(0)
     return buffer
 
@@ -221,10 +236,11 @@ if st.button("Generate PDF"):
         st.warning("Sila isi nama SU sebelum generate PDF.")
 
     else:
-        pdf_buf = build_pdf(logo_file)  # hantar logo_file
+        pdf_buf = build_pdf(logo_file, bg_file)
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
