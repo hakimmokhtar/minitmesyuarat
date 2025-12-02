@@ -4,13 +4,10 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
 from reportlab.lib import colors
 from io import BytesIO
 from PIL import Image as PILImage
 from datetime import date
-
 
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
@@ -22,13 +19,14 @@ template = st.selectbox("Pilih Template Mesyuarat", ["Harian", "EXCO"])
 # --- Common header inputs ---
 with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     bil = st.text_input("BIL. (contoh: 3)", value="")
-    tarikh = st.date_input("Tarikh :", value=date.today())
-    masa = st.text_input("Masa : (contoh: 9 pm)", value="")
-    tempat = st.text_input("Tempat/Platform :", value="")
-    nama_anda = st.text_input("Disediakan oleh : (contoh: Muhammad Hakim bin Mokhtar)", value="")
-    jawatan_anda = st.text_input("Jawatan : (contoh: Setiausaha DPPKR)", value="")
-    sign_anda = st.text_input("Nama Sign : (contoh: hakim)", value="")
-    letterhead_image = st.file_uploader("Upload Letterhead (PNG)", type=["png"])
+    tarikh = st.date_input("Tarikh", value=date.today())
+    masa = st.text_input("Masa", value="9:00 PM")
+    tempat = st.text_input("Tempat", value="Pejabat DPPK Rembau / Online")
+    nama_su = st.text_input("Nama SU (Disediakan oleh)", value="")
+    logo_file = st.file_uploader("Muat naik logo (png/jpg)", type=["png","jpg","jpeg"])
+    
+
+    
     
 
 # ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
@@ -82,7 +80,7 @@ num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value
 
 agenda = []
 for i in range(int(num_agenda)):
-    title = st.text_input(f"Agenda {i+1}", key=f"agenda_title_{i}")
+    title = st.text_input(f"Agenda {i+1} Tajuk", key=f"agenda_title_{i}")
     notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: 1.1, 1.1.1, ...)", key=f"agenda_notes_{i}")
     agenda.append({"title": title, "notes": notes})
 
@@ -90,106 +88,54 @@ for i in range(int(num_agenda)):
 
 
 # ======== Hal-hal berbangkit dan Penutup ========
-hal_berbangkit = st.text_area("Hal-hal Berbangkit", value="")
+hal_berbangkit = st.text_area("Hal-hal Berbangkit (6.x)", value="")
 penutup = st.text_area(
     "Penutup",
     value="Mesyuarat diakhiri dengan tasbih kafarah & Surah Al-Asr"
 )
 
+# ======== Helper: Logo scaling ========
+def get_reportlab_image(file, max_width_mm=30):
+    if not file:
+        return None
+    img = PILImage.open(file)
+    max_w_px = int(max_width_mm * (72/25.4))
+    w, h = img.size
+    if w > max_w_px:
+        ratio = max_w_px / w
+        img = img.resize((int(w*ratio), int(h*ratio)))
+    bio = BytesIO()
+    img.save(bio, format='PNG')
+    bio.seek(0)
+    return bio
+from reportlab.lib.utils import ImageReader
+
+def draw_bg(canvas_obj, doc, bg_image):
+    if bg_image:
+        canvas_obj.saveState()
+        img = ImageReader(bg_image)
+        canvas_obj.drawImage(img, 0, 0, width=A4[0], height=A4[1])
+        canvas_obj.restoreState()
 
 # ======== PDF Builder ========
-
-def build_pdf(logo_file=None, letterhead=None):
+def build_pdf(logo_file=None, bg_file=None):
     buffer = BytesIO()
-
-    # create canvas
-    c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
-
-    # ============= LETTERHEAD BACKGROUND =============
-    if letterhead is not None:
-        bg = ImageReader(letterhead)
-        c.drawImage(bg, 0, 0, width=width, height=height)
-
-    # ============= MULAKAN TULISAN =============  
-    text = c.beginText(40, height - 120)
-    text.setFont("Helvetica", 11)
-
-    text.textLine("Jabatan Setiausaha")
-    text.textLine("Dewan Pemuda PAS Kawasan Rembau")
-    text.textLine(f"MINIT MESYUARAT AJK — BIL {bil}")
-
-    text.textLine("")
-    text.textLine(f"Tarikh : {tarikh.strftime('%d %B %Y')}")
-    text.textLine(f"Masa   : {masa}")
-    text.textLine(f"Tempat : {tempat}")
-    text.textLine("")
-
-    # KEHADIRAN
-    text.textLine("KEHADIRAN:")
-    for r in att_rows:
-        text.textLine(f"{r['no']}. {r['jawatan']} - {r['nama']} [{r['hadir']}]")
-
-    # AGENDA
-    text.textLine("")
-    text.textLine("AGENDA:")
-    for i, ag in enumerate(agenda, start=1):
-        text.textLine(f"{i}. {ag['title']}")
-
-    # PENUTUP
-    text.textLine("")
-    text.textLine("PENUTUP:")
-    text.textLine(penutup)
-
-    # SIGNATURE
-    text.textLine("")
-    text.textLine("Disediakan oleh,")
-    text.textLine("")
-    text.textLine(nama_anda)
-
-    c.drawText(text)
-    c.showPage()
-    c.save()
-
-    buffer.seek(0)
-    return buffer
-
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+                            rightMargin=18*mm, leftMargin=18*mm,
+                            topMargin=18*mm, bottomMargin=18*mm)
+    styles = getSampleStyleSheet()
+    normal = styles['Normal']
+    h1 = ParagraphStyle(name='CenterTitle', fontSize=12, leading=14, alignment=1, spaceAfter=6)
+    h2 = ParagraphStyle(name='SmallBold', fontSize=10, leading=12, spaceAfter=4)
     elems = []
 
-
-
-    # --- Semua content minit ----
-    elems.append(Paragraph("Jabatan Setiausaha", h1))
-    elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
-    elems.append(Paragraph("<b>MINIT MESYUARAT</b>", h1))
-    # … (SEMUA kod minit kekal seperti biasa)
-
-    doc.build(elems)
-    buffer.seek(0)
-    return buffer
-
-    def merge_with_letterhead(body_pdf, letterhead_pdf):
-        letter = PdfReader(letterhead_pdf)
-        body = PdfReader(body_pdf)
-
-        writer = PdfWriter()
-
-        # Page 1: merge
-        first_letter = letter.pages[0]
-        first_body = body.pages[0]
-
-        PageMerge(first_letter).add(first_body).render()
-        writer.addpage(first_letter)
-
-        # Page 2+
-        for page in body.pages[1:]:
-            writer.addpage(page)
-
-        out = BytesIO()
-        writer.write(out)
-        out.seek(0)
-        return out
-
+    # Header
+    if logo_file is not None:
+        img_bio = get_reportlab_image(logo_file, max_width_mm=30)
+        if img_bio:
+            img = Image(img_bio)
+            img.drawHeight = 22*mm
+            elems.append(img)
 
     elems.append(Paragraph("Jabatan Setiausaha", h1))
     elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
@@ -263,99 +209,37 @@ def build_pdf(logo_file=None, letterhead=None):
     signature_style = ParagraphStyle(
         name="Signature",
         fontName="Helvetica-Oblique",  # boleh tukar ke BrushScriptMT kalau font ada
-        fontSize=20,
+        fontSize=12,
         leading=14
     )
 
     # Signature
     elems.append(Paragraph("Disediakan oleh:", normal))
-    elems.append(Spacer(1,20))
-    elems.append(Paragraph(f"<b>{sign_anda}</b>", signature_style))
-    sign_line = "________________"
-    elems.append(Paragraph(sign_line, normal))
     elems.append(Spacer(1,8))
-    elems.append(Paragraph(f"<b>{nama_anda}</b>", normal))
-    elems.append(Paragraph(f"<b>{jawatan_anda}</b>", normal))
+    sign_line = "__________________________"
+    elems.append(Paragraph(sign_line, normal))
+    elems.append(Paragraph(f"{nama_su}", signature_style))
+    elems.append(Paragraph("Setiausaha\nDewan Pemuda PAS Kawasan Rembau", normal))
 
-    doc.build(elems)
+    doc.build(
+    elems, 
+    onFirstPage=lambda c, d: draw_bg(c, d, bg_file),
+    onLaterPages=lambda c, d: draw_bg(c, d, bg_file)
+)
+
     buffer.seek(0)
     return buffer
 
 # ======== Generate Button ========
 if st.button("Generate PDF"):
-    if not all([bil, tarikh, masa, tempat, nama_anda, jawatan_anda, sign_anda]):
-        st.warning("Sila lengkapkan semua maklumat.")
-    
+    if not nama_su:
+        st.warning("Sila isi nama SU sebelum generate PDF.")
+
     else:
-        pdf_buf = build_pdf(letterhead_image)
-        st.success("PDF berjaya.")
-        st.download_button(
-            "Muat Turun Minit",
-            data=pdf_buf.getvalue(),
-            file_name="minit.pdf",
-            mime="application/pdf"
-        )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        pdf_buf = build_pdf(logo_file, bg_file)
+        st.success("PDF berjaya dihasilkan.")
+        st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
+                           file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
 
 
 
