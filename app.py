@@ -213,20 +213,37 @@ def add_letterhead():
 
 def build_pdf():
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4,
-                            rightMargin=30, leftMargin=30,
-                            topMargin=40, bottomMargin=30)
+    try:
+        doc = SimpleDocTemplate(buffer, pagesize=A4,
+                                rightMargin=30, leftMargin=30,
+                                topMargin=40, bottomMargin=30)
 
-    styles = getSampleStyleSheet()
-    normal = styles["Normal"]
-    bold_center = ParagraphStyle("bold_center",
-                                 parent=styles["Heading2"],
-                                 alignment=1,
-                                 spaceAfter=10)
+        elements = []
 
-    elements = []
+        # Letterhead
+        letter = add_letterhead()
+        if letter is not None:
+            elements.append(letter)
+            elements.append(Spacer(1,10))
+
+        # Contoh tambah text
+        elements.append(Paragraph("TEST PDF", getSampleStyleSheet()["Normal"]))
+
+        # Build PDF
+        doc.build(elements)
+
+        # Ambil content PDF
+        pdf = buffer.getvalue()
+
+    except Exception as e:
+        st.error(f"Error semasa build PDF: {e}")
+        pdf = None
+
+    finally:
+        buffer.close()
 
     return pdf
+
     
     # Letterhead
 
@@ -318,6 +335,7 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
 
 
 
