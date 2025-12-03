@@ -212,7 +212,11 @@ def build_pdf():
     
     # Letterhead
 
-from PIL import Image as PILImage
+
+letter = add_letterhead()
+    if letter:
+        elements.append(letter)
+        elements.append(Spacer(1, 10))
 
 def add_letterhead():
     try:
@@ -228,13 +232,9 @@ def add_letterhead():
         new_height = int(orig_height * scale)
 
         return Image("letterhead.png", width=new_width, height=new_height)
+        
     except:
         return None
-
-letter = add_letterhead()
-if letter:
-    elements.append(letter)
-    elements.append(Spacer(1, 10))
 
 
     # Tajuk
@@ -319,5 +319,6 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
 
 
