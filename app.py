@@ -9,6 +9,7 @@ from io import BytesIO
 from datetime import date
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from PIL import Image as PILImage
 
 # Register font untuk signature
 pdfmetrics.registerFont(TTFont('MrDafoe', 'MrDafoe-Regular.ttf'))
@@ -208,11 +209,31 @@ def build_pdf():
     elements = []
 
     # Letterhead
+
+from PIL import Image as PILImage
+
+def add_letterhead():
     try:
-        elements.append(Image("letterhead.png", width=540, height=80))
-        elements.append(Spacer(1, 10))
+        img = PILImage.open("letterhead.png")
+        orig_width, orig_height = img.size
+
+        # Lebar PDF (A4) dalam pixel approx
+        max_width = 500  
+
+        # Kira ratio untuk kekalkan bentuk asal
+        scale = max_width / orig_width
+        new_width = max_width
+        new_height = int(orig_height * scale)
+
+        return Image("letterhead.png", width=new_width, height=new_height)
     except:
-        pass
+        return None
+
+letter = add_letterhead()
+if letter:
+    elements.append(letter)
+    elements.append(Spacer(1, 10))
+
 
     # Tajuk
     elements.append(Paragraph(f"<b>{config['header_title']}</b>", bold_center))
@@ -297,3 +318,4 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
