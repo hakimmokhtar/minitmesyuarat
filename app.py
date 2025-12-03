@@ -224,8 +224,8 @@ def build_pdf(logo_file=None, bg_file=None):
     elems.append(Paragraph(f"<b>{sign_anda}</b>", signature_style))
     sign_line = "____________________"
     elems.append(Paragraph(sign_line, normal))
-    elems.append(Paragraph(f"<b>{nama_anda}.upper</b>", normal))
-    elems.append(Paragraph(f"<b>{jawatan_anda}.upper</b>", normal))
+    elems.append(Paragraph(f"<b>{nama_anda}.upper()</b>", normal))
+    elems.append(Paragraph(f"<b>{jawatan_anda}.upper()</b>", normal))
 
     doc.build(
     elems, 
@@ -246,6 +246,7 @@ if st.button("Generate PDF"):
         st.success("PDF berjaya dihasilkan.")
         st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
                            file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+
 
 
 
