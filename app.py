@@ -193,31 +193,6 @@ catatan = st.text_area("Catatan", "").upper()
 # ============================
 #   PDF GENERATOR
 # ============================
-def build_pdf():
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4,
-                            rightMargin=30, leftMargin=30,
-                            topMargin=40, bottomMargin=30)
-
-    styles = getSampleStyleSheet()
-    normal = styles["Normal"]
-    bold_center = ParagraphStyle("bold_center",
-                                 parent=styles["Heading2"],
-                                 alignment=1,
-                                 spaceAfter=10)
-
-    elements = []
-
-    return pdf
-    
-    # Letterhead
-
-
-letter = add_letterhead()
-if letter:
-        elements.append(letter)
-        elements.append(Spacer(1, 10))
-
 def add_letterhead():
     try:
         img = PILImage.open("letterhead.png")
@@ -236,7 +211,30 @@ def add_letterhead():
     except:
         return None
 
+def build_pdf():
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+                            rightMargin=30, leftMargin=30,
+                            topMargin=40, bottomMargin=30)
 
+    styles = getSampleStyleSheet()
+    normal = styles["Normal"]
+    bold_center = ParagraphStyle("bold_center",
+                                 parent=styles["Heading2"],
+                                 alignment=1,
+                                 spaceAfter=10)
+
+    elements = []
+
+    # Letterhead
+
+    letter = add_letterhead()
+    if letter:
+        elements.append(letter)
+        elements.append(Spacer(1, 10))
+        
+    return pdf
+    
     # Tajuk
     elements.append(Paragraph(f"<b>{config['header_title']}</b>", bold_center))
     elements.append(Spacer(1, 10))
@@ -319,6 +317,7 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
 
 
 
