@@ -226,6 +226,8 @@ def build_pdf():
 
     elements = []
 
+    return pdf
+    
     # Letterhead
 
     letter = add_letterhead()
@@ -233,7 +235,6 @@ def build_pdf():
         elements.append(letter)
         elements.append(Spacer(1, 10))
         
-    return pdf
     
     # Tajuk
     elements.append(Paragraph(f"<b>{config['header_title']}</b>", bold_center))
@@ -317,6 +318,7 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
 
 
 
