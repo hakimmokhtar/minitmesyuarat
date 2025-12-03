@@ -6,278 +6,294 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from io import BytesIO
-from PIL import Image as PILImage
 from datetime import date
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+# Register font untuk signature
 pdfmetrics.registerFont(TTFont('MrDafoe', 'MrDafoe-Regular.ttf'))
 
-st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau (Multi-Template)", layout="centered")
+# ============================
+#   PAGE SETTINGS
+# ============================
+st.set_page_config(page_title="Sistem Minit Mesyuarat — DPPKR", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
-st.write("Pilih template mesyuarat → isi borang → klik **Generate PDF** untuk muat turun minit mengikut format rasmi.")
 
-# --- Template selection ---
-template = st.selectbox("Pilih Template Mesyuarat", ["Harian", "EXCO"])
+# ============================
+#   MULTI TEMPLATE SYSTEM
+# ============================
+TEMPLATES = {
 
-# --- Common header inputs ---
-with st.expander("Maklumat Umum Mesyuarat", expanded=True):
-    bil = st.text_input("BIL. (contoh: 3)", value="")
-    tarikh = st.date_input("Tarikh", value=date.today())
-    masa = st.text_input("Masa", value="9:00 PM")
-    tempat = st.text_input("Tempat", value="")
-    nama_anda = st.text_input("Disediakan oleh (contoh: Muhammad Hakim bin Mokhtar)", value="")
-    jawatan_anda = st.text_input("Jawatan (contoh: Setiausaha DPPKR)", value="")
-    sign_anda = st.text_input("Nama Sign (contoh: Hakim)", value="")
-    bg_file = st.file_uploader("", type=["png"])
+    "Harian DPPKR": {
+        "header_title": "MINIT MESYUARAT HARIAN DPPK REMBAU",
+        "ajk_list": [
+            "Ketua Pemuda - Irsyad",
+            "Timbalan Ketua Pemuda - Zafreen",
+            "Naib Ketua Pemuda - Rahman",
+            "Setiausaha - Hakim",
+            "Penolong Setiausaha - Naim",
+            "Bendahari - Izzuddin",
+        ],
+        "default_agenda": [
+            "Pembentangan Minit Lalu",
+            "Perkara Berbangkit",
+            "Makluman / Laporan",
+            "Hal-hal Lain"
+        ]
+    },
 
-    
-    
+    "EXCO DPPKR": {
+        "header_title": "MESYUARAT EXCO DPPK REMBAU",
+        "ajk_list": [
+            "Ketua Pemuda - Irsyad",
+            "Timbalan Ketua Pemuda - Zafreen",
+            "Naib Ketua Pemuda - Rahman",
+            "Setiausaha - Hakim",
+            "Penolong Setiausaha - Naim",
+            "Bendahari - Izzuddin",
+            "Penerangan - Afiq",
+            "Dakwah - Ust Zaid",
+            "Amal - Umair",
+        ],
+        "default_agenda": [
+            "Ucapan Pengerusi",
+            "Laporan Setiausaha",
+            "Laporan Bendahari",
+            "Laporan Lajnah",
+            "Hal-hal Lain"
+        ]
+    },
 
-# ======== Kehadiran Automasuk – Pilih Nama, Pilih Hadir/X ========
-st.markdown("### Kehadiran AJK")
+    "Lajnah Pengurusan": {
+        "header_title": "MESYUARAT LAJNAH PENGURUSAN",
+        "ajk_list": [
+            "Pengarah - Zafreen",
+            "Setiausaha - Hakim",
+            "AJK - Naim",
+        ],
+        "default_agenda": [
+            "Pelaksanaan Program",
+            "Perancangan Kewangan",
+            "Kemaskini Dokumen Rasmi",
+        ]
+    },
 
-AJK_LIST = [
-    "Ketua Pemuda - Irsyad",
-    "Timbalan Ketua Pemuda - Zafreen",
-    "Naib Ketua Pemuda - Rahman",
-    "Setiausaha - Hakim",
-    "Penolong Setiausaha - Naim",
-    "Bendahari - Izzuddin",
-    "Penerangan - Afiq Asnawi",
-    "Jabatan Pembangunan Remaja - Muzammil",
-    "Pilihanraya & Kebajikan - Ma’az",
-    "Aktar - Arif Aiman",
-    "Jabatan Amal - Umair",
-    "Dakwah - Ust Zaid",
-    "Ketua DACS - Adhwa",
-    "Timbalan Ketua DACS - Azmil",
-    "Ekonomi - Aman"
-]
+    "Lajnah Dakwah": {
+        "header_title": "MESYUARAT LAJNAH DAKWAH",
+        "ajk_list": [
+            "Pengarah Dakwah - Ust Zaid",
+            "Setiausaha - Hakim",
+            "AJK - Azmil",
+        ],
+        "default_agenda": [
+            "Tarbiah",
+            "Kuliah / Ceramah",
+            "Ziarah",
+            "Hal-hal Lain"
+        ]
+    },
 
-att_rows = []
+    "Lajnah Amal": {
+        "header_title": "MESYUARAT JABATAN AMAL",
+        "ajk_list": [
+            "Pengarah Amal - Umair",
+            "Setiausaha - Hakim",
+            "AJK - Rahman",
+        ],
+        "default_agenda": [
+            "Latihan Amal",
+            "Kebajikan",
+            "Bantuan Kecemasan",
+        ]
+    },
 
-for i, ajk in enumerate(AJK_LIST):
-    jawatan, nama = ajk.split(" - ")
+    "Lajnah Penerangan": {
+        "header_title": "MESYUARAT LAJNAH PENERANGAN",
+        "ajk_list": [
+            "Ketua Penerangan - Afiq",
+            "Setiausaha - Hakim",
+            "AJK Media - Aman",
+        ],
+        "default_agenda": [
+            "Media Sosial",
+            "Siaran Berita",
+            "Reka Grafik / Video",
+            "Hal-hal Lain"
+        ]
+    }
 
-    c1, c2, c3, c4, c5 = st.columns([1, 2, 3, 1, 2])
+}
 
-    hadir = c4.selectbox(
-        f"Hadir {nama}",
-        options=["/", "X"],
-        key=f"hadir_{i}"
-    )
+# ============================
+#   PILIH TEMPLATE
+# ============================
+template_name = st.selectbox("Pilih Template Mesyuarat", list(TEMPLATES.keys()))
+config = TEMPLATES[template_name]
 
-    catatan = c5.text_input(f"Catatan {nama}", key=f"catatan_{i}")
+# ============================
+#   MAKLUMAT MESYUARAT
+# ============================
+st.subheader("Maklumat Mesyuarat")
 
-    att_rows.append({
-        "no": str(i+1),
-        "jawatan": jawatan,
-        "nama": nama,
-        "hadir": hadir,
-        "cat": catatan
-    })
+tarikh = st.date_input("Tarikh Mesyuarat", value=date.today())
+masa = st.text_input("Masa Mesyuarat", "9:00 malam").upper()
+tempat = st.text_input("Tempat Mesyuarat", "Pejabat PAS Rembau").upper()
+pengerusi = st.text_input("Pengerusi Mesyuarat", "KETUA PEMUDA").upper()
 
-# ======== Agenda Input ========
-st.markdown("### Agenda")
-num_agenda = st.number_input("Bilangan Agenda", min_value=1, max_value=30, value=5, step=1)
+# ============================
+#   SENARAI KEHADIRAN
+# ============================
+st.write("---")
+st.subheader("Senarai Kehadiran")
 
+status_options = ["HADIR", "X"]
+kehadiran = {}
 
-agenda = []
-for i in range(int(num_agenda)):
-    title = st.text_input(f"Agenda {i+1}", key=f"agenda_title_{i}")
-    notes = st.text_area(f"Perbincangan & Keputusan untuk Agenda {i+1} (boleh tulis berlapis: {i+1}.1, {i+1}.1.1, ...)", key=f"agenda_notes_{i}")
-    agenda.append({"title": title, "notes": notes})
+for item in config["ajk_list"]:
+    nama, jawatan = item.split(" - ")
+    col1, col2, col3 = st.columns([3, 2, 2])
 
+    with col1:
+        st.text_input(f"Nama ({jawatan})", value=nama, key=f"nama_{nama}", disabled=True)
 
+    with col2:
+        st.text_input("Jawatan", value=jawatan, key=f"jawatan_{nama}", disabled=True)
 
+    with col3:
+        kehadiran[nama] = st.selectbox("Status", status_options, key=f"status_{nama}")
 
-# ======== Hal-hal berbangkit dan Penutup ========
-hal_berbangkit = st.text_area("Hal-hal Berbangkit", value="")
-penutup = st.text_area(
-    "Penutup",
-    value="Mesyuarat diakhiri dengan tasbih kafarah & Surah Al-Asr"
-)
+# ============================
+#   AGENDA
+# ============================
+st.write("---")
+st.subheader("Agenda Mesyuarat")
 
+agenda_list = []
 
-# ======== PDF Builder ========
+st.markdown("### Agenda Default")
+for ag in config["default_agenda"]:
+    agenda_list.append(st.text_input(f"Agenda:", value=ag, key=f"agenda_{ag}").upper())
 
-def draw_bg(canvas, doc, bg_file):
-    if bg_file is None:
-        return
+st.markdown("### Agenda Tambahan")
+extra_count = st.number_input("Bilangan Agenda Tambahan", 0, 10, 0)
 
-    canvas.saveState()
-    canvas.drawImage(
-        bg_file, 
-        0, 0,
-        width=A4[0],
-        height=A4[1],
-        preserveAspectRatio=True,
-        mask='auto'
-    )
-    canvas.restoreState()
+for i in range(extra_count):
+    extra = st.text_input(f"Agenda Tambahan {i+1}").upper()
+    if extra.strip() != "":
+        agenda_list.append(extra)
 
-def draw_bg(canvas, doc, bg_file):
-    if bg_file is None:
-        return
-    canvas.saveState()
-    canvas.drawImage(bg_file, 0, 0, width=A4[0], height=A4[1])
-    canvas.restoreState()
-def build_pdf(logo_file=None, bg_file=None):
+# ============================
+#   CATATAN
+# ============================
+st.write("---")
+st.subheader("Catatan / Hal-hal Lain")
+catatan = st.text_area("Catatan", "").upper()
+
+# ============================
+#   PDF GENERATOR
+# ============================
+def build_pdf():
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
-                            rightMargin=18*mm, leftMargin=18*mm,
-                            topMargin=18*mm, bottomMargin=18*mm)
+                            rightMargin=30, leftMargin=30,
+                            topMargin=40, bottomMargin=30)
+
     styles = getSampleStyleSheet()
-    normal = styles['Normal']
-    h1 = ParagraphStyle(name='CenterTitle', fontSize=12, leading=14, alignment=1, spaceAfter=6)
-    h2 = ParagraphStyle(name='SmallBold', fontSize=10, leading=12, spaceAfter=4)
-    elems = []
+    normal = styles["Normal"]
+    bold_center = ParagraphStyle("bold_center",
+                                 parent=styles["Heading2"],
+                                 alignment=1,
+                                 spaceAfter=10)
 
-    # Header
-    if logo_file is not None:
-        img_bio = get_reportlab_image(logo_file, max_width_mm=30)
-        if img_bio:
-            img = Image(img_bio)
-            img.drawHeight = 22*mm
-            elems.append(img)
+    elements = []
 
-    elems.append(Paragraph("Jabatan Setiausaha", h1))
-    elems.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
-    elems.append(Paragraph("<b>MINIT MESYUARAT AHLI JAWATANKUASA</b>", h1))
-    bil_text = bil.strip() or "___"
-    elems.append(Paragraph(f"<b>BIL. {bil_text} / 2025–2027</b>", h1))
-    elems.append(Spacer(1,6))
+    # Letterhead
+    try:
+        elements.append(Image("letterhead.png", width=540, height=80))
+        elements.append(Spacer(1, 10))
+    except:
+        pass
 
-    meta = [
-        ["Tarikh:", tarikh.strftime("%d %B %Y")],
-        ["Masa:", masa],
-        ["Tempat:", tempat]
-    ]
-    mt = Table(meta, colWidths=[40*mm, 110*mm])
-    elems.append(mt)
-    elems.append(Spacer(1,6))
+    # Tajuk
+    elements.append(Paragraph(f"<b>{config['header_title']}</b>", bold_center))
+    elements.append(Spacer(1, 10))
 
-    # Kehadiran table
-    elems.append(Paragraph("<b>KEHADIRAN</b>", h2))
-    table_data = [["No","Jawatan","Nama","Hadir","Catatan"]]
-    for r in att_rows:
-        table_data.append([r["no"], r["jawatan"], r["nama"], r["hadir"], r["cat"]])
+    # Info Mesyuarat
+    info_text = f"""
+    <b>Tarikh:</b> {tarikh.strftime('%d/%m/%Y')}<br/>
+    <b>Masa:</b> {masa}<br/>
+    <b>Tempat:</b> {tempat}<br/>
+    <b>Pengerusi:</b> {pengerusi}<br/>
+    """
+    elements.append(Paragraph(info_text.upper(), normal))
+    elements.append(Spacer(1, 15))
 
-    tbl = Table(table_data, colWidths=[12*mm, 70*mm, 40*mm, 18*mm, 30*mm])
-    tbl.setStyle(TableStyle([
-        ('GRID',(0,0),(-1,-1),0.4,colors.grey),
-        ('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
-        ('VALIGN',(0,0),(-1,-1),'MIDDLE')
+    # Kehadiran Table
+    elements.append(Paragraph("<b>SENARAI KEHADIRAN</b>", normal))
+    elements.append(Spacer(1, 5))
+
+    table_data = [["NAMA", "JAWATAN", "STATUS"]]
+
+    for item in config["ajk_list"]:
+        nama, jawatan = item.split(" - ")
+        table_data.append([nama.upper(), jawatan.upper(), kehadiran[nama]])
+
+    table = Table(table_data, colWidths=[180, 150, 80])
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
+        ("GRID", (0,0), (-1,-1), 0.8, colors.black),
+        ("ALIGN", (2,1), (2,-1), "CENTER"),
+        ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
     ]))
-    elems.append(tbl)
-    elems.append(Spacer(1,4))
 
-    # Auto jumlah kehadiran
-    jumlah_kehadiran_auto = sum(1 for r in att_rows if r["hadir"] == "/")
-    elems.append(Paragraph(f"Jumlah kehadiran : {jumlah_kehadiran_auto} / {len(att_rows)}", normal))
-    elems.append(Spacer(1,8))
+    elements.append(table)
+    elements.append(Spacer(1, 15))
 
     # Agenda
-    elems.append(Paragraph("<b>AGENDA</b>", h2))
-    for i, ag in enumerate(agenda, start=1):
-        elems.append(Paragraph(f"{i}) {ag['title']}", normal))
-        elems.append(Spacer(1,8))
+    elements.append(Paragraph("<b>AGENDA MESYUARAT</b>", normal))
+    elements.append(Spacer(1, 5))
 
-    # Perbincangan
-    elems.append(Paragraph("<b>PERBINCANGAN</b>", h2))
-    for idx, ag in enumerate(agenda, start=1):
-        elems.append(Paragraph(f"<b>{idx}. {ag['title']}</b>", normal))
-        lines = [ln.strip() for ln in (ag['notes'] or "").splitlines() if ln.strip()]
-        if lines:
-            for ln in lines:
-                elems.append(Paragraph(ln, normal))
-        else:
-            elems.append(Paragraph("-", normal))
-        elems.append(Spacer(1,4))
+    for i, ag in enumerate(agenda_list, start=1):
+        elements.append(Paragraph(f"{i}. {ag}", normal))
+        elements.append(Spacer(1, 3))
 
-    # Hal-hal berbangkit
-    elems.append(Paragraph("<b>HAL-HAL BERBANGKIT</b>", h2))
-    if hal_berbangkit.strip():
-        for ln in hal_berbangkit.splitlines():
-            elems.append(Paragraph(ln, normal))
-    else:
-        elems.append(Paragraph("-", normal))
-    elems.append(Spacer(1,10))
+    elements.append(Spacer(1, 15))
 
-    # Penutup
-    elems.append(Paragraph("<b>PENUTUP</b>", h2))
-    elems.append(Paragraph(penutup or "-", normal))
-    elems.append(Spacer(1,14))
-
-    # Signature style
-    signature_style = ParagraphStyle(
-        name="Signature",
-        fontName="MrDafoe",  # boleh tukar ke BrushScriptMT kalau font ada
-        fontSize=25,
-        leading=14
-    )
+    # Catatan
+    if catatan.strip() != "":
+        elements.append(Paragraph("<b>CATATAN / HAL-HAL LAIN</b>", normal))
+        elements.append(Paragraph(catatan.upper(), normal))
+        elements.append(Spacer(1, 20))
 
     # Signature
-    elems.append(Paragraph("Disediakan oleh:", normal))
-    elems.append(Spacer(1,20))
-    elems.append(Paragraph(f"<b>{sign_anda}</b>", signature_style))
-    sign_line = "____________________"
-    elems.append(Paragraph(sign_line, normal))
-    elems.append(Paragraph(f"<b>{nama_anda}.upper()</b>", normal))
-    elems.append(Paragraph(f"<b>{jawatan_anda}.upper()</b>", normal))
+    elements.append(Spacer(1, 30))
+    elements.append(Paragraph("Disediakan oleh,", normal))
+    elements.append(Spacer(1, 45))
 
-    doc.build(
-    elems, 
-    onFirstPage=lambda c, d: draw_bg(c, d, bg_file),
-    onLaterPages=lambda c, d: draw_bg(c, d, bg_file)
-)
+    signature_html = f"""
+    <font name='MrDafoe' size='24'>{pengerusi.title()}</font><br/>
+    <b>Pengerusi Mesyuarat</b>
+    """
+    elements.append(Paragraph(signature_html, ParagraphStyle("sig", alignment=0)))
+    elements.append(Spacer(1, 20))
 
-    buffer.seek(0)
-    return buffer
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
 
-# ======== Generate Button ========
-if st.button("Generate PDF"):
-    if not all([bil, tarikh, masa, tempat, nama_anda, jawatan_anda, sign_anda]):
-         st.warning("Sila lengkapkan semua maklumat.")
+# ============================
+#   DOWNLOAD BUTTON
+# ============================
+st.write("## Muat Turun Dokumen")
 
-    else:
-        pdf_buf = build_pdf(logo_file=None, bg_file=None)
-        st.success("PDF berjaya dihasilkan.")
-        st.download_button("Muat Turun Minit (PDF)", data=pdf_buf,
-                           file_name=f"minit_BIL{bil or 'x'}_{tarikh}.pdf", mime="application/pdf")
+if st.button("Generate PDF Minit Mesyuarat"):
+    pdf_output = build_pdf()
+    st.success("PDF berjaya dijana!")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    st.download_button(
+        label="📄 Download PDF",
+        data=pdf_output,
+        file_name=f"minit_mesyuarat_{tarikh}.pdf",
+        mime="application/pdf"
+    )
