@@ -211,6 +211,15 @@ def add_letterhead():
     except:
         return None
 
+
+# Letterhead
+        
+        letter = add_letterhead()
+        if letter is not None:
+            elements.append(letter)
+            elements.append(Spacer(1,10))
+
+
 def build_pdf():
     buffer = BytesIO()
     try:
@@ -219,13 +228,6 @@ def build_pdf():
                                 topMargin=40, bottomMargin=30)
 
         elements = []
-
-        # Letterhead
-        letter = add_letterhead()
-        if letter is not None:
-            elements.append(letter)
-            elements.append(Spacer(1,10))
-
 
         # Build PDF
         doc.build(elements)
@@ -242,9 +244,6 @@ def build_pdf():
 
     return pdf
 
-
-
-        
     
     # Tajuk
     elements.append(Paragraph(f"<b>{config['header_title']}</b>", bold_center))
@@ -328,6 +327,7 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
 
 
 
