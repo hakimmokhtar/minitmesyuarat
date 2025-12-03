@@ -20,10 +20,39 @@ except:
 # Page config
 st.set_page_config(page_title="Minit Mesyuarat - DPPK Rembau", layout="centered")
 st.title("Sistem Minit Mesyuarat — Dewan Pemuda PAS Kawasan Rembau")
-st.write("Pilih template → isi borang → klik **Generate PDF** untuk muat turun minit mengikut format rasmi.")
+st.write("Pilih template → isi borang → klik **Generate PDF** untuk muat turun minit.")
 
 # --- Template selection ---
-template = st.selectbox("Pilih Template Mesyuarat", ["Harian", "EXCO"])
+template = st.selectbox(
+    "Pilih Template Mesyuarat",
+    ["Harian DPPKR", "EXCO DPPKR", "Lajnah"]
+)
+
+# --- Template-specific setup ---
+if template == "Harian DPPKR":
+    header_title = "MINIT MESYUARAT HARIAN DPPKR"
+    default_ajk = [
+        "Ketua Pemuda - Irsyad",
+        "Timbalan Ketua Pemuda - Zafreen",
+        "Setiausaha - Hakim",
+        "Bendahari - Izzuddin"
+    ]
+elif template == "EXCO DPPKR":
+    header_title = "MINIT MESYUARAT EXCO DPPKR"
+    default_ajk = [
+        "Ketua Pemuda - Irsyad",
+        "Naib Ketua Pemuda - Rahman",
+        "Setiausaha - Hakim",
+        "Penolong Setiausaha - Naim",
+        "Bendahari - Izzuddin"
+    ]
+elif template == "Lajnah":
+    header_title = "MINIT MESYUARAT LAJNAH"
+    default_ajk = [
+        "Ketua Lajnah - Ali",
+        "Setiausaha Lajnah - Hana",
+        "Bendahari Lajnah - Umar"
+    ]
 
 # --- Common header inputs ---
 with st.expander("Maklumat Umum Mesyuarat", expanded=True):
@@ -34,29 +63,12 @@ with st.expander("Maklumat Umum Mesyuarat", expanded=True):
     nama_anda = st.text_input("Disediakan oleh", value="")
     jawatan_anda = st.text_input("Jawatan", value="")
     sign_anda = st.text_input("Nama Sign", value="")
-    bg_file = st.file_uploader("Upload Letterhead (PNG)", type=["png"])
+    letterhead_file = st.file_uploader("Upload Letterhead (PNG)", type=["png"])
 
-# --- Kehadiran AJK ---
+# --- Kehadiran dynamic based on template ---
 st.markdown("### Kehadiran AJK")
-AJK_LIST = [
-    "Ketua Pemuda - Irsyad",
-    "Timbalan Ketua Pemuda - Zafreen",
-    "Naib Ketua Pemuda - Rahman",
-    "Setiausaha - Hakim",
-    "Penolong Setiausaha - Naim",
-    "Bendahari - Izzuddin",
-    "Penerangan - Afiq Asnawi",
-    "Jabatan Pembangunan Remaja - Muzammil",
-    "Pilihanraya & Kebajikan - Ma’az",
-    "Aktar - Arif Aiman",
-    "Jabatan Amal - Umair",
-    "Dakwah - Ust Zaid",
-    "Ketua DACS - Adhwa",
-    "Timbalan Ketua DACS - Azmil",
-    "Ekonomi - Aman"
-]
 att_rows = []
-for i, ajk in enumerate(AJK_LIST):
+for i, ajk in enumerate(default_ajk):
     jawatan, nama = ajk.split(" - ")
     c1, c2, c3, c4, c5 = st.columns([1, 2, 3, 1, 2])
     hadir = c4.selectbox(f"Hadir {nama}", options=["/", "X"], key=f"hadir_{i}")
@@ -101,21 +113,22 @@ def build_pdf():
                                 topMargin=18*mm, bottomMargin=18*mm)
         elements = []
 
-        # Letterhead
-        letter = add_letterhead(bg_file)
+        # Letterhead (sama untuk semua template)
+        letter = add_letterhead(letterhead_file)
         if letter is not None:
             elements.append(letter)
             elements.append(Spacer(1, 10))
 
-        # Header
+        # Styles
         styles = getSampleStyleSheet()
         normal = styles['Normal']
         h1 = ParagraphStyle(name='CenterTitle', fontSize=12, leading=14, alignment=1, spaceAfter=6)
         h2 = ParagraphStyle(name='SmallBold', fontSize=10, leading=12, spaceAfter=4)
 
+        # Header
         elements.append(Paragraph("Jabatan Setiausaha", h1))
         elements.append(Paragraph("Dewan Pemuda PAS Kawasan Rembau", h1))
-        elements.append(Paragraph("<b>MINIT MESYUARAT AHLI JAWATANKUASA</b>", h1))
+        elements.append(Paragraph(f"<b>{header_title}</b>", h1))
         bil_text = bil.strip() or "___"
         elements.append(Paragraph(f"<b>BIL. {bil_text} / 2025–2027</b>", h1))
         elements.append(Spacer(1,6))
@@ -146,7 +159,6 @@ def build_pdf():
         for i, ag in enumerate(agenda, start=1):
             elements.append(Paragraph(f"{i}) {ag['title']}", normal))
             elements.append(Spacer(1,4))
-
         elements.append(Paragraph("<b>PERBINCANGAN</b>", h2))
         for idx, ag in enumerate(agenda, start=1):
             elements.append(Paragraph(f"<b>{idx}. {ag['title']}</b>", normal))
