@@ -226,8 +226,6 @@ def build_pdf():
             elements.append(letter)
             elements.append(Spacer(1,10))
 
-        # Contoh tambah text
-        elements.append(Paragraph("TEST PDF", getSampleStyleSheet()["Normal"]))
 
         # Build PDF
         doc.build(elements)
@@ -244,13 +242,8 @@ def build_pdf():
 
     return pdf
 
-    
-    # Letterhead
 
-    letter = add_letterhead()
-    if letter:
-        elements.append(letter)
-        elements.append(Spacer(1, 10))
+
         
     
     # Tajuk
@@ -335,6 +328,7 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
 
 
 
