@@ -208,6 +208,8 @@ def build_pdf():
 
     elements = []
 
+    return pdf
+    
     # Letterhead
 
 from PIL import Image as PILImage
@@ -301,7 +303,6 @@ if letter:
     doc.build(elements)
     pdf = buffer.getvalue()
     buffer.close()
-    return pdf
 
 # ============================
 #   DOWNLOAD BUTTON
@@ -318,4 +319,5 @@ if st.button("Generate PDF Minit Mesyuarat"):
         file_name=f"minit_mesyuarat_{tarikh}.pdf",
         mime="application/pdf"
     )
+
 
